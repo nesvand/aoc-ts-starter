@@ -8,9 +8,6 @@ dependencies:
   '@dagrejs/graphlib':
     specifier: ^2.1.13
     version: 2.1.13
-  graphlib:
-    specifier: ^2.1.8
-    version: 2.1.8
   heap-js:
     specifier: ^2.3.0
     version: 2.3.0
@@ -31,9 +28,6 @@ devDependencies:
   '@types/eslint':
     specifier: ^8.40.0
     version: 8.40.0
-  '@types/graphlib':
-    specifier: ^2.1.8
-    version: 2.1.8
   '@types/jest':
     specifier: ^29.5.2
     version: 29.5.2
@@ -1067,10 +1061,6 @@ packages:
       '@types/node': 20.2.5
     dev: true
 
-  /@types/graphlib@2.1.8:
-    resolution: {integrity: sha512-8nbbyD3zABRA9ePoBgAl2ym8cIwKQXTfv1gaIRTdY99yEOCaHfmjBeRp+BIemS8NtOqoWK7mfzWxjNrxLK3T5w==}
-    dev: true
-
   /@types/istanbul-lib-coverage@2.0.4:
     resolution: {integrity: sha512-z/QT1XN4K4KYuslS23k62yDIDLwLFkzxOuMplDtObz0+y7VqJCaO2o+SPwHCvLFZh7xazvvoor2tA/hPz9ee7g==}
     dev: true
@@ -2088,12 +2078,6 @@ packages:
   /graphemer@1.4.0:
     resolution: {integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==}
     dev: true
-
-  /graphlib@2.1.8:
-    resolution: {integrity: sha512-jcLLfkpoVGmH7/InMC/1hIvOPSUh38oJtGhvrOFGzioE1DZ+0YW16RgmOJhHiuWTvGiJQ9Z1Ik43JvkRPRvE+A==}
-    dependencies:
-      lodash: 4.17.21
-    dev: false
 
   /has-flag@3.0.0:
     resolution: {integrity: sha512-sKJf1+ceQBr4SMkvQnBDNDtf4TXpVhVGateu0t918bl30FnbE2m4vNLX+VWe/dpjlb+HugGYzW7uQXH98HPEYw==}
