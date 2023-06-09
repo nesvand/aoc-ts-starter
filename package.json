@@ -3,8 +3,9 @@
     "version": "0.1.0",
     "description": "Typescript solutions for Advent of Code 2023",
     "scripts": {
-        "test": "jest",
-        "gen": "tsx scripts/gen.ts"
+        "test": "scripts/test.sh",
+        "gen": "tsx scripts/gen.ts",
+        "start": "scripts/start.sh"
     },
     "keywords": [
         "aoc",
