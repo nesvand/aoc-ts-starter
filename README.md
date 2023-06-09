@@ -1,34 +1,30 @@
-Advent of Code Typescript Starter
-
-[![Test Report](https://github.com/nesvand/aoc2022/actions/workflows/test-report.yml/badge.svg)](https://github.com/nesvand/aoc2022/actions/workflows/test-report.yml)
+# Advent of Code Typescript Starter
+[![Test Report](https://github.com/nesvand/aoc-solutions/actions/workflows/ci.yml/badge.svg)](https://github.com/nesvand/aoc-solutions/actions/workflows/ci.yml)
 
 A template for [Advent of Code](https://adventofcode.com) written in Typescript with Node.
 
+(Adapted from https://github.com/nesvand/aoc-solutions/actions/workflows/ci.yml)
+
 ## Usage
 
-The project uses [Node.js](https://nodejs.org) for the javascript runtime, [esbuild](https://esbuild.github.io)
-as the typescript transpiler and [swc](https://swc.rs) with [Jest](https://jestjs.io) for testing.
+The project uses [Node.js](https://nodejs.org) for the javascript runtime, [pnpm](https://pnpm.io) for the package manager, and [Jest](https://jestjs.io) with [ts-jest](https://github.com/kulshekhar/ts-jest) for testing.
 
-    $ git clone https://github.com/ljgago/advent-of-code-typescript-starter aoc-typescript
-    $ cd aoc-typescript
-
-    # install dependencies
-    $ npm install
-
-    # check syntax with eslint
-    $ npm run lint day01
-
-    # run tests for day01
-    $ npm test day01
-
-    # run the day01
-    # npm start day01
+```bash
+git clone https://github.com/nesvand/aoc-solutions
+cd aoc-solutions
+# install dependencies
+pnpm install
+# run tests for day01
+pnpm test day01
+# run day01
+pnpm start day01
+```
 
 ## Generate
 
 You can generate all necessary files for use in the event with a simple command:
 
-    $ npm run gen day01
+    $ pnpm gen day01
 
 This command generates these files:
 
@@ -57,7 +53,7 @@ You can to get the session token from the cookie web browser.
 
 Also can you set the `AOC_YEAR` to select a certain year.
 
-(It is not mandatory use the `AOC_YEAR`, the `npm run gen` can get the year automatically)
+(It is not mandatory use the `AOC_YEAR`, the `pnpm gen` can get the year automatically)
 
 You can set an `.env` file with these variables.
 
