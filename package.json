@@ -17,14 +17,14 @@
     "license": "MIT",
     "dependencies": {
         "@dagrejs/graphlib": "^2.1.13",
-        "@types/graphlib": "^2.1.8",
-        "@types/lodash": "^4.14.195",
         "graphlib": "^2.1.8",
         "heap-js": "^2.3.0",
         "lodash": "^4.17.21",
         "nerdamer": "^1.1.13"
     },
     "devDependencies": {
+        "@types/graphlib": "^2.1.8",
+        "@types/lodash": "^4.14.195",
         "@tsconfig/node20": "^1.0.1",
         "@types/ejs": "^3.1.2",
         "@types/eslint": "^8.40.0",
