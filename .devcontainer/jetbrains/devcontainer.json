@@ -1,0 +1,9 @@
+{
+	"name": "Jetbrains",
+	"features": {
+    		"ghcr.io/devcontainers/features/sshd:1": {
+        		"version": "latest"
+    		}
+	},
+	"postCreateCommand": "npm i -g pnpm && pnpm i"
+}
