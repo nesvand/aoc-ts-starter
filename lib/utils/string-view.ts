@@ -37,6 +37,11 @@ function isDigit(char?: string) {
     return char >= '0' && char <= '9';
 }
 
+/**
+ * A utility class for parsing a string in an immutable way. In general new memory is only allocated when the `data`
+ * getter is accessed. It is by no means as efficient as accessing a constant char array in C, but it does ensure you can
+ * work in a non-destructive way with strings.
+ */
 export class StringView {
     _source: { data: string };
     start = 0;

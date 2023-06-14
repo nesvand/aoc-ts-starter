@@ -73,4 +73,7 @@ Folder structure:
 
 Happy coding!
 
+## Additional Credits
+`StringView` is adapted from [sv](https://github.com/tsoding/sv) by [Alexey Kutepov](https://github.com/tsoding).
+
 [MIT License](LICENSE)
