@@ -1,21 +1,6 @@
-// import {
-//     getBit,
-//     setBit,
-//     clearBit,
-//     updateBit,
-//     toggleBit,
-//     isBitSet,
-//     isBitClear,
-//     isBitOn,
-//     isBitOff,
-// } from '@lib/utils/bits';
+import { hexToPaddedBinary, bitStringToNumber, bitsToNumber, bitSubstring, type Bit } from '@lib/utils/bits';
 
-import { bits } from '@lib/utils';
-import type { Bit } from '@lib/utils/bits';
-
-const { hexToPaddedBinary, bitStringToNumber, bitsToNumber, bitSubstring } = bits;
-
-describe('utils/bits', () => {
+describe('@lib/utils/bits', () => {
     describe('hexToPaddedBinary', () => {
         test('should convert hex to padded binary', () => {
             const testValues = [

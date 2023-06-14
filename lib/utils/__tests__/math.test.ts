@@ -1,8 +1,6 @@
-import { math } from '@lib/utils';
+import { isNumber, mod, lerpAngle, lerp, clamp, mapRange } from '@lib/utils/math';
 
-const { isNumber, mod, lerpAngle, lerp, clamp, mapRange } = math;
-
-describe('utils/math', () => {
+describe('@lib/utils/math', () => {
     describe('isNumber', () => {
         test('should return true for numbers', () => {
             const testValues = [1, 2, 3, 4, 5, 6, 7, 8, 9];

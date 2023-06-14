@@ -1,8 +1,22 @@
-import { array } from '@lib/utils';
+import {
+    sort,
+    sortby,
+    sum,
+    product,
+    max,
+    isArray,
+    lastIndex,
+    lastItem,
+    lastItems,
+    asNumbers,
+    from,
+    zip,
+    splitOn,
+    chunk,
+    rollingWindow,
+} from '@lib/utils/array';
 
-const { sort, sortby, sum, product, max, isArray, lastIndex, lastItem, lastItems, asNumbers, from, zip, splitOn, chunk, rollingWindow } = array;
-
-describe('utils/array', () => {
+describe('@lib/utils/array', () => {
     describe('sort', () => {
         it('should sort numbers', () => {
             expect(sort([3, 2, 1])).toEqual([1, 2, 3]);

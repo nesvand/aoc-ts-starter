@@ -1,0 +1,175 @@
+import { StringView, isWhitespace } from '@lib/utils/string-view';
+
+describe('@lib/utils/string-view', () => {
+    describe('StringView', () => {
+        test('should be instantiable', () => {
+            expect(new StringView('')).toBeInstanceOf(StringView);
+        });
+
+        test('should be instantiable with string', () => {
+            expect(new StringView('test').toString()).toBe('test');
+        });
+
+        test('should be instantiable with string view', () => {
+            expect(StringView.fromStringView(new StringView('test')).toString()).toBe('test');
+        });
+
+        test('charAt', () => {
+            expect(new StringView('test').charAt(0)).toBe('t');
+        });
+
+        test('substr', () => {
+            expect(new StringView('test').substr(1).toString()).toBe('est');
+        });
+
+        test('indexOf', () => {
+            expect(new StringView('test').indexOf('es')).toBe(1);
+        });
+
+        test('eq', () => {
+            expect(new StringView('test').eq(new StringView('test'))).toBe(true);
+        });
+
+        test('eqIgnoreCase', () => {
+            expect(new StringView('test').eqIgnoreCase(new StringView('TEST'))).toBe(true);
+        });
+
+        test('startsWith', () => {
+            expect(new StringView('test').startsWith(new StringView('te'))).toBe(true);
+        });
+
+        test('endsWith', () => {
+            expect(new StringView('test').endsWith(new StringView('st'))).toBe(true);
+        });
+
+        test('toString', () => {
+            expect(new StringView('test').toString()).toBe('test');
+        });
+
+        test('trimLeft', () => {
+            expect(new StringView('\n\t\r  test').trimLeft().toString()).toBe('test');
+        });
+
+        test('trimRight', () => {
+            expect(new StringView('test  \t\n\r').trimRight().toString()).toBe('test');
+        });
+
+        test('trim', () => {
+            expect(new StringView('\n\r\t  test  \t\r\n').trim().toString()).toBe('test');
+        });
+
+        test('takeLeftWhile', () => {
+            const sv = new StringView('1234test');
+            expect(sv.takeLeftWhile((char) => typeof char !== 'undefined' && ['1', '2', '3', '4'].includes(char)).toString()).toBe('1234');
+            expect(sv.toString()).toBe('1234test');
+        });
+
+        test('chopLeft', () => {
+            const sv = new StringView('1234test');
+            expect(sv.chopLeft(4).toString()).toBe('1234');
+            expect(sv.toString()).toBe('test');
+        });
+
+        test('chopRight', () => {
+            const sv = new StringView('1234test');
+            expect(sv.chopRight(4).toString()).toBe('test');
+            expect(sv.toString()).toBe('1234');
+        });
+
+        test('tryChopByDelimiter', () => {
+            const sv = new StringView('1234 test');
+            const result = sv.tryChopByDelimiter(' ');
+            expect(result.success).toBe(true);
+            expect(sv.toString()).toBe('test');
+            expect(result.data?.toString()).toBe('1234');
+
+            const sv2 = new StringView('1234test');
+            const result2 = sv2.tryChopByDelimiter(' ');
+            expect(result2.success).toBe(false);
+            expect(sv2.toString()).toBe('1234test');
+            expect(result2.data).toBeUndefined();
+        });
+
+        test('chopByDelimiter', () => {
+            const sv = new StringView('1234 test');
+            const result = sv.chopByDelimiter(' ');
+            expect(sv.toString()).toBe('test');
+            expect(result.toString()).toBe('1234');
+
+            const sv2 = new StringView('1234test');
+            const result2 = sv2.chopByDelimiter(' ');
+            expect(sv2.toString()).toBe('');
+            expect(result2.data).toBe('1234test');
+        });
+
+        test('chopByStringView', () => {
+            const delim = new StringView('  ');
+            const sv = new StringView('1234  test');
+            const result = sv.chopByStringView(delim);
+            expect(sv.toString()).toBe('test');
+            expect(result.toString()).toBe('1234');
+            expect(delim.toString()).toBe('  ');
+
+            const sv2 = new StringView('1234test');
+            const result2 = sv2.chopByStringView(delim);
+            expect(sv2.toString()).toBe('');
+            expect(result2.toString()).toBe('1234test');
+            expect(delim.toString()).toBe('  ');
+        });
+
+        test('toInt', () => {
+            expect(new StringView('1234test').toInt()).toBe(1234);
+        });
+
+        test('toFloat', () => {
+            expect(new StringView('1234.56test').toFloat()).toBe(1234.56);
+        });
+
+        test('chopInt', () => {
+            const sv = new StringView('1234test');
+            expect(sv.chopInt().toString()).toBe('1234');
+            expect(sv.toString()).toBe('test');
+        });
+
+        test('chopFloat', () => {
+            const sv = new StringView('1234.56test');
+            expect(sv.chopFloat().toString()).toBe('1234.56');
+            expect(sv.toString()).toBe('test');
+        });
+
+        test('chopLeftWhile', () => {
+            const sv = new StringView('1234test');
+            expect(sv.chopLeftWhile((char) => typeof char !== 'undefined' && ['1', '2', '3', '4'].includes(char)).toString()).toBe('1234');
+            expect(sv.toString()).toBe('test');
+        });
+
+        test('example compound use', () => {
+            const data = '           1 2 3 4 5 6 7 8 9 10        ';
+            const expected = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+            const sv = new StringView(data);
+            const result: number[] = [];
+            while (sv.chopLeftWhile(isWhitespace) && sv.toString().length > 0) {
+                result.push(sv.chopInt());
+            }
+
+            expect(result).toEqual(expected);
+            expect(sv.toString()).toBe('');
+        });
+    });
+
+    describe('isWhitespace', () => {
+        test('should return true for whitespace', () => {
+            expect(isWhitespace(' ')).toBe(true);
+            expect(isWhitespace('\t')).toBe(true);
+            expect(isWhitespace('\n')).toBe(true);
+            expect(isWhitespace('\r')).toBe(true);
+        });
+
+        test('should return false for non-whitespace', () => {
+            expect(isWhitespace('a')).toBe(false);
+            expect(isWhitespace('1')).toBe(false);
+            expect(isWhitespace('')).toBe(false);
+        });
+    });
+});

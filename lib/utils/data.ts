@@ -25,8 +25,4 @@ export class RingBuffer<T> {
     public get pointer(): number {
         return this._pointer;
     }
-
-    public set pointer(value: number) {
-        this._pointer = value;
-    }
 }

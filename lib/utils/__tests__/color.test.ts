@@ -1,9 +1,15 @@
-import { color } from '@lib/utils';
-import type { Color } from '@lib/utils/color';
+import {
+    lerpColor,
+    colorToHex,
+    hexToColor,
+    colorToRGBAString,
+    colorToRGBString,
+    colorToHexString,
+    hexStringToColor,
+    type Color,
+} from '@lib/utils/color';
 
-const { lerpColor, colorToHex, hexToColor, colorToRGBAString, colorToRGBString, colorToHexString, hexStringToColor } = color;
-
-describe('utils/color', () => {
+describe('@lib/utils/color', () => {
     describe('lerpColor', () => {
         test('should lerp between two colors', () => {
             const a: Color = { r: 0, g: 0, b: 0, a: 1 };

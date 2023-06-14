@@ -1,8 +1,6 @@
-import { general } from '@lib/utils';
+import { asyncTimes, invert, isDefined, mapGetOrCreate, times, wait } from '@lib/utils/general';
 
-const { asyncTimes, invert, isDefined, mapGetOrCreate, times, wait } = general;
-
-describe('utils/general', () => {
+describe('@lib/utils/general', () => {
     describe('isDefined', () => {
         test('only considers `undefined` and `null` to be false', () => {
             const vals = [undefined, null, '', 0, false, true, 'test', 1, {}, []];
