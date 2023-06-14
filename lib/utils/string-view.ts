@@ -16,18 +16,39 @@ function isDigit(char?: string) {
 }
 
 export class StringView {
-    constructor(public data: string) {}
+    _source: { data: string };
+    start = 0;
+    size: number;
+
+    constructor(data: string) {
+        this._source = { data };
+        this.size = data.length;
+    }
 
     static fromStringView(sv: StringView) {
-        return new StringView(sv.data);
+        const copy = new StringView('');
+        copy._source = sv._source;
+        copy.start = sv.start;
+        copy.size = sv.size;
+
+        return copy;
+    }
+
+    static fromParts(source: { data: string }, start: number, size: number) {
+        const copy = new StringView('');
+        copy._source = source;
+        copy.start = start;
+        copy.size = size;
+
+        return copy;
+    }
+
+    private get data() {
+        return this._source.data.substring(this.start, this.start + this.size);
     }
 
     public charAt(index: number): string {
         return this.data.charAt(index);
-    }
-
-    public substr(start: number, length?: number) {
-        return new StringView(this.data.substring(start, length));
     }
 
     public indexOf(search: string): number {
@@ -60,7 +81,7 @@ export class StringView {
             i++;
         }
 
-        return this.substr(i);
+        return StringView.fromParts(this._source, this.start + i, this.size - i);
     }
 
     public trimRight() {
@@ -69,7 +90,7 @@ export class StringView {
             i++;
         }
 
-        return this.substr(0, this.data.length - i);
+        return StringView.fromParts(this._source, this.start, this.size - i);
     }
 
     public trim() {
@@ -82,7 +103,7 @@ export class StringView {
             i++;
         }
 
-        return this.substr(0, i);
+        return StringView.fromParts(this._source, this.start, i);
     }
 
     public chopLeft(size: number) {
@@ -90,8 +111,9 @@ export class StringView {
             size = this.data.length;
         }
 
-        const result = this.substr(0, size);
-        this.data = this.data.substring(size);
+        const result = StringView.fromParts(this._source, this.start, size);
+        this.start += size;
+        this.size -= size;
 
         return result;
     }
@@ -101,8 +123,8 @@ export class StringView {
             size = this.data.length;
         }
 
-        const result = this.substr(this.data.length - size);
-        this.data = this.data.substring(0, this.data.length - size);
+        const result = StringView.fromParts(this._source, this.start + this.size - size, size);
+        this.size -= size;
 
         return result;
     }
@@ -113,10 +135,11 @@ export class StringView {
             i++;
         }
 
-        const data = this.substr(0, i);
+        const data = StringView.fromParts(this._source, this.start, i);
 
-        if (i < this.data.length) {
-            this.data = this.data.substring(i + 1);
+        if (i < this.size) {
+            this.start += i + 1;
+            this.size -= i + 1;
             return { data, success: true };
         }
 
@@ -129,32 +152,35 @@ export class StringView {
             i++;
         }
 
-        const result = this.substr(0, i);
+        const result = StringView.fromParts(this._source, this.start, i);
 
-        if (i < this.data.length) {
-            this.data = this.data.substring(i + 1);
+        if (i < this.size) {
+            this.start += i + 1;
+            this.size -= i + 1;
         } else {
-            this.data = '';
+            this.start += i;
+            this.size -= i;
         }
 
         return result;
     }
 
     public chopByStringView(delim: StringView) {
-        let window = this.substr(0, delim.data.length);
+        const window = StringView.fromParts(this._source, this.start, delim.size);
         let i = 0;
-        while (i + delim.data.length < this.data.length && !window.eq(delim)) {
+        while (i + delim.size < this.size && !window.eq(delim)) {
             i++;
-            window = this.substr(i, i + delim.data.length);
+            window.start++;
         }
 
-        let result = this.substr(0, i);
+        const result = StringView.fromParts(this._source, this.start, i);
 
-        if (i + delim.data.length === this.data.length) {
-            result = this.substr(0, i + delim.data.length);
+        if (i + delim.size === this.size) {
+            result.size += delim.size;
         }
 
-        this.data = this.data.substring(i + delim.data.length);
+        this.start += i + delim.size;
+        this.size -= i + delim.size;
 
         return result;
     }
@@ -192,27 +218,37 @@ export class StringView {
     }
 
     public chopInt() {
-        let i = 0;
-        while (i < this.data.length && isDigit(this.data.charAt(i))) {
-            i++;
+        let result = 0;
+        while (this.size > 0 && isDigit(this.charAt(0))) {
+            result = result * 10 + parseInt(this.charAt(0));
+            this.start++;
+            this.size--;
         }
-
-        const result = parseInt(this.substr(0, i).toString(), 10);
-
-        this.data = this.data.substring(i);
 
         return result;
     }
 
     public chopFloat() {
-        let i = 0;
-        while (i < this.data.length && (isDigit(this.data.charAt(i)) || this.data.charAt(i) === '.')) {
-            i++;
+        let result = 0.0;
+        let decimal = 0.0;
+
+        while (this.size > 0) {
+            if (this.charAt(0) === '.') {
+                decimal = 1.0;
+            } else if (!isDigit(this.charAt(0))) {
+                return result;
+            } else {
+                if (decimal > 0.0) {
+                    decimal *= 0.1;
+                    result += decimal * parseInt(this.charAt(0));
+                } else {
+                    result = result * 10 + parseInt(this.charAt(0));
+                }
+            }
+
+            this.start++;
+            this.size--;
         }
-
-        const result = parseFloat(this.substr(0, i).toString());
-
-        this.data = this.data.substring(i);
 
         return result;
     }
@@ -223,9 +259,9 @@ export class StringView {
             i++;
         }
 
-        const result = this.substr(0, i);
-
-        this.data = this.data.substring(i);
+        const result = StringView.fromParts(this._source, this.start, i);
+        this.start += i;
+        this.size -= i;
 
         return result;
     }

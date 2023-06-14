@@ -18,10 +18,6 @@ describe('@lib/utils/string-view', () => {
             expect(new StringView('test').charAt(0)).toBe('t');
         });
 
-        test('substr', () => {
-            expect(new StringView('test').substr(1).toString()).toBe('est');
-        });
-
         test('indexOf', () => {
             expect(new StringView('test').indexOf('es')).toBe(1);
         });
@@ -99,7 +95,7 @@ describe('@lib/utils/string-view', () => {
             const sv2 = new StringView('1234test');
             const result2 = sv2.chopByDelimiter(' ');
             expect(sv2.toString()).toBe('');
-            expect(result2.data).toBe('1234test');
+            expect(result2.toString()).toBe('1234test');
         });
 
         test('chopByStringView', () => {
@@ -149,12 +145,19 @@ describe('@lib/utils/string-view', () => {
 
             const sv = new StringView(data);
             const result: number[] = [];
-            while (sv.chopLeftWhile(isWhitespace) && sv.toString().length > 0) {
+            while (sv.chopLeftWhile(isWhitespace) && sv.size > 0) {
                 result.push(sv.chopInt());
             }
 
             expect(result).toEqual(expected);
             expect(sv.toString()).toBe('');
+        });
+
+        test('original text is not modified', () => {
+            const sv = new StringView('1234 test');
+            const result = sv.chopByDelimiter(' ');
+            expect(sv._source.data).toBe('1234 test');
+            expect(sv._source === result._source).toBe(true);
         });
     });
 
