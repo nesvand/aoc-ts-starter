@@ -1,4 +1,4 @@
-import { StringView, isWhitespace } from '@lib/utils/string-view';
+import { StringView, isWhitespace, isDigit } from '@lib/utils/string-view';
 
 describe('@lib/utils/string-view', () => {
     describe('StringView', () => {
@@ -60,16 +60,32 @@ describe('@lib/utils/string-view', () => {
             expect(sv.toString()).toBe('1234test');
         });
 
-        test('chopLeft', () => {
-            const sv = new StringView('1234test');
-            expect(sv.chopLeft(4).toString()).toBe('1234');
-            expect(sv.toString()).toBe('test');
+        describe('chopLeft', () => {
+            test('should chop left', () => {
+                const sv = new StringView('1234test');
+                expect(sv.chopLeft(4).toString()).toBe('1234');
+                expect(sv.toString()).toBe('test');
+            });
+
+            test('should chop left with size > length', () => {
+                const sv = new StringView('1234test');
+                expect(sv.chopLeft(100).toString()).toBe('1234test');
+                expect(sv.toString()).toBe('');
+            });
         });
 
-        test('chopRight', () => {
-            const sv = new StringView('1234test');
-            expect(sv.chopRight(4).toString()).toBe('test');
-            expect(sv.toString()).toBe('1234');
+        describe('chopRight', () => {
+            test('should chop right', () => {
+                const sv = new StringView('1234test');
+                expect(sv.chopRight(4).toString()).toBe('test');
+                expect(sv.toString()).toBe('1234');
+            });
+
+            test('should chop right with size > length', () => {
+                const sv = new StringView('1234test');
+                expect(sv.chopRight(100).toString()).toBe('1234test');
+                expect(sv.toString()).toBe('');
+            });
         });
 
         test('tryChopByDelimiter', () => {
@@ -119,6 +135,7 @@ describe('@lib/utils/string-view', () => {
 
         test('toFloat', () => {
             expect(new StringView('1234.56test').toFloat()).toBe(1234.56);
+            expect(new StringView('1234.56').toFloat()).toBe(1234.56);
         });
 
         test('chopInt', () => {
@@ -131,6 +148,10 @@ describe('@lib/utils/string-view', () => {
             const sv = new StringView('1234.56test');
             expect(sv.chopFloat().toString()).toBe('1234.56');
             expect(sv.toString()).toBe('test');
+
+            const sv2 = new StringView('1234.56');
+            expect(sv2.chopFloat().toString()).toBe('1234.56');
+            expect(sv2.toString()).toBe('');
         });
 
         test('chopLeftWhile', () => {
@@ -173,6 +194,35 @@ describe('@lib/utils/string-view', () => {
             expect(isWhitespace('a')).toBe(false);
             expect(isWhitespace('1')).toBe(false);
             expect(isWhitespace('')).toBe(false);
+        });
+
+        test('should return false for undefined', () => {
+            expect(isWhitespace(undefined)).toBe(false);
+        });
+    });
+
+    describe('isDigit', () => {
+        test('should return true for digits', () => {
+            expect(isDigit('0')).toBe(true);
+            expect(isDigit('1')).toBe(true);
+            expect(isDigit('2')).toBe(true);
+            expect(isDigit('3')).toBe(true);
+            expect(isDigit('4')).toBe(true);
+            expect(isDigit('5')).toBe(true);
+            expect(isDigit('6')).toBe(true);
+            expect(isDigit('7')).toBe(true);
+            expect(isDigit('8')).toBe(true);
+            expect(isDigit('9')).toBe(true);
+        });
+
+        test('should return false for non-digits', () => {
+            expect(isDigit('a')).toBe(false);
+            expect(isDigit(' ')).toBe(false);
+            expect(isDigit('')).toBe(false);
+        });
+
+        test('should return false for undefined', () => {
+            expect(isDigit(undefined)).toBe(false);
         });
     });
 });

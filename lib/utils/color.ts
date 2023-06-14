@@ -1,6 +1,4 @@
-import { math } from '@lib/utils';
-
-const { lerp } = math;
+import * as math from '@lib/utils/math';
 
 export interface Color {
     r: number;
@@ -10,10 +8,10 @@ export interface Color {
 }
 
 export const lerpColor = (a: Color, b: Color, t: number): Color => {
-    const r = lerp(a.r, b.r, t);
-    const g = lerp(a.g, b.g, t);
-    const bl = lerp(a.b, b.b, t);
-    const a_ = lerp(a.a, b.a, t);
+    const r = math.lerp(a.r, b.r, t);
+    const g = math.lerp(a.g, b.g, t);
+    const bl = math.lerp(a.b, b.b, t);
+    const a_ = math.lerp(a.a, b.a, t);
     return { r, g, b: bl, a: a_ };
 };
 

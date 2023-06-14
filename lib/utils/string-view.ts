@@ -30,7 +30,7 @@ export function isWhitespace(char?: string) {
     );
 }
 
-function isDigit(char?: string) {
+export function isDigit(char?: string) {
     if (char === undefined) {
         return false;
     }
