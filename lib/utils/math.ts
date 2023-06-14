@@ -25,8 +25,12 @@ export const lerp = (start: number, end: number, percent: number): number => sta
  * @example lerpAngle(0, Math.PI, 0.5) // Math.PI / 2
  */
 export const lerpAngle = (start: number, end: number, percent: number): number => {
-    const shortestAngle = mod(end - start + Math.PI, Math.PI * 2) - Math.PI;
-    return mod(start + shortestAngle * percent, Math.PI * 2);
+    const naive = Math.abs(lerp(start, end, percent));
+    if (naive > Math.PI) {
+        return mod(naive, Math.PI);
+    }
+
+    return naive;
 };
 
 /**
