@@ -214,23 +214,35 @@ export class StringView {
 
     public toInt() {
         let result = 0;
+        let sign = 1;
+        let offset = 0;
+        if (this.data.charAt(0) === '-') {
+            sign = -1;
+            offset = 1;
+        } else if (this.data.charAt(0) === '+') offset = 1;
 
-        for (let i = 0; i < this.data.length && isDigit(this.data.charAt(i)); i++) {
+        for (let i = 0 + offset; i < this.data.length && isDigit(this.data.charAt(i)); i++) {
             result = result * 10 + parseInt(this.data.charAt(i));
         }
 
-        return result;
+        return result * sign;
     }
 
     public toFloat() {
         let result = 0.0;
         let decimal = 0.0;
+        let sign = 1;
+        let offset = 0;
+        if (this.data.charAt(0) === '-') {
+            sign = -1;
+            offset = 1;
+        } else if (this.data.charAt(0) === '+') offset = 1;
 
-        for (let i = 0; i < this.data.length; i++) {
+        for (let i = 0 + offset; i < this.data.length; i++) {
             if (this.data.charAt(i) === '.') {
                 decimal = 1.0;
             } else if (!isDigit(this.data.charAt(i))) {
-                return result;
+                return result * sign;
             } else {
                 if (decimal > 0.0) {
                     decimal *= 0.1;
@@ -241,10 +253,20 @@ export class StringView {
             }
         }
 
-        return result;
+        return result * sign;
     }
 
     public chopInt() {
+        let sign = 1;
+        if (this.data.charAt(0) === '-') {
+            sign = -1;
+            this.start++;
+            this.size--;
+        } else if (this.data.charAt(0) === '+') {
+            this.start++;
+            this.size--;
+        }
+
         let result = 0;
         while (this.size > 0 && isDigit(this.charAt(0))) {
             result = result * 10 + parseInt(this.charAt(0));
@@ -252,10 +274,20 @@ export class StringView {
             this.size--;
         }
 
-        return result;
+        return result * sign;
     }
 
     public chopFloat() {
+        let sign = 1;
+        if (this.data.charAt(0) === '-') {
+            sign = -1;
+            this.start++;
+            this.size--;
+        } else if (this.data.charAt(0) === '+') {
+            this.start++;
+            this.size--;
+        }
+
         let result = 0.0;
         let decimal = 0.0;
 
@@ -263,7 +295,7 @@ export class StringView {
             if (this.charAt(0) === '.') {
                 decimal = 1.0;
             } else if (!isDigit(this.charAt(0))) {
-                return result;
+                return result * sign;
             } else {
                 if (decimal > 0.0) {
                     decimal *= 0.1;
@@ -277,7 +309,7 @@ export class StringView {
             this.size--;
         }
 
-        return result;
+        return result * sign;
     }
 
     public chopLeftWhile(predicate: (char?: string) => boolean) {

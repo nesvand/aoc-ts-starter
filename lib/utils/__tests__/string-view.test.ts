@@ -131,27 +131,32 @@ describe('@lib/utils/string-view', () => {
 
         test('toInt', () => {
             expect(new StringView('1234test').toInt()).toBe(1234);
+            expect(new StringView('-1234foo').toInt()).toBe(-1234);
         });
 
         test('toFloat', () => {
             expect(new StringView('1234.56test').toFloat()).toBe(1234.56);
-            expect(new StringView('1234.56').toFloat()).toBe(1234.56);
+            expect(new StringView('-1234.56foo').toFloat()).toBe(-1234.56);
         });
 
         test('chopInt', () => {
             const sv = new StringView('1234test');
-            expect(sv.chopInt().toString()).toBe('1234');
+            expect(sv.chopInt()).toBe(1234);
             expect(sv.toString()).toBe('test');
+
+            const sv2 = new StringView('-1234foo');
+            expect(sv2.chopInt()).toBe(-1234);
+            expect(sv2.toString()).toBe('foo');
         });
 
         test('chopFloat', () => {
             const sv = new StringView('1234.56test');
-            expect(sv.chopFloat().toString()).toBe('1234.56');
+            expect(sv.chopFloat()).toBe(1234.56);
             expect(sv.toString()).toBe('test');
 
-            const sv2 = new StringView('1234.56');
-            expect(sv2.chopFloat().toString()).toBe('1234.56');
-            expect(sv2.toString()).toBe('');
+            const sv2 = new StringView('-1234.56foo');
+            expect(sv2.chopFloat()).toBe(-1234.56);
+            expect(sv2.toString()).toBe('foo');
         });
 
         test('chopLeftWhile', () => {
