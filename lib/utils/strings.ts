@@ -19,7 +19,14 @@ export function float() {
     };
 }
 
-type Choppers = typeof int | typeof word | typeof float;
+export function optional() {
+    return function (sv: StringView) {
+        if (isWhitespace(sv.charAt(0))) return '';
+        return sv.chopLeft(1).toString();
+    };
+}
+
+type Choppers = typeof int | typeof word | typeof float | typeof optional;
 type Chopped<C extends Choppers[]> = C extends [infer First extends Choppers, ...infer Rest extends Choppers[]]
     ? [ReturnType<ReturnType<First>>, ...Chopped<Rest>]
     : [];
@@ -28,7 +35,9 @@ export function extract<C extends Choppers[]>(parts: TemplateStringsArray, ...pa
     return function (input: StringView): Chopped<C> {
         const result: any = [];
         for (let i = 0; i < parsers.length; i++) {
-            input.chopByStringView(new StringView(parts[i]));
+            const part = parts[i];
+            if (!part) throw new ReferenceError('Part not found');
+            input.chopByStringView(new StringView(part));
             const parser = parsers[i];
             if (!parser) throw new ReferenceError('Parser not found');
             result.push(parser()(input));
