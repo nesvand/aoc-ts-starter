@@ -7,14 +7,15 @@ import chalk from 'chalk';
 import z from 'zod';
 import { fromZodError } from 'zod-validation-error';
 
-const templateTargets = (dayName: string) => [
-    ['scripts/templates/index.template.ejs', `src/${dayName}/index.ts`],
-    ['scripts/templates/main.template.ejs', `src/${dayName}/main.ts`],
-    ['scripts/templates/part1.template.ejs', `src/${dayName}/part1.ts`],
-    ['scripts/templates/part2.template.ejs', `src/${dayName}/part2.ts`],
-    ['scripts/templates/readme.template.ejs', `src/${dayName}/README.md`],
-    ['scripts/templates/day.test.template.ejs', `test/${dayName}.test.ts`],
-];
+const templateTargets = (dayName: string) =>
+    [
+        ['scripts/templates/index.template.ejs', `src/${dayName}/index.ts`],
+        ['scripts/templates/main.template.ejs', `src/${dayName}/main.ts`],
+        ['scripts/templates/part1.template.ejs', `src/${dayName}/part1.ts`],
+        ['scripts/templates/part2.template.ejs', `src/${dayName}/part2.ts`],
+        ['scripts/templates/readme.template.ejs', `src/${dayName}/README.md`],
+        ['scripts/templates/day.test.template.ejs', `test/${dayName}.test.ts`],
+    ] as const;
 
 const inputTargetPath = (dayName: string): string => `src/${dayName}/resources/input.txt`;
 
@@ -119,6 +120,10 @@ const DayArgumentValidator = /(?<=day)\d+(?!\w)/;
     const dayName = process.argv[2];
     if (process.argv.length != 3) {
         console.log('--- `npm run gen` needs one only argument ---');
+        return;
+    }
+    if (!dayName) {
+        console.log('--- The argument must be `day + NUM` (e.g. day01) ---');
         return;
     }
 
