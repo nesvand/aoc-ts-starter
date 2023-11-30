@@ -3,8 +3,7 @@
   "version": "0.1.0",
   "description": "Typescript solutions for Advent of Code 2023",
   "scripts": {
-    "test": "jest",
-    "test:script": "scripts/test.sh",
+    "test": "scripts/test.sh",
     "gen": "tsx scripts/gen.ts",
     "start": "scripts/start.sh",
     "coverage": "jest --ci --reporters=default --reporters=jest-junit"

@@ -1,9 +1,10 @@
 # Advent of Code Typescript Starter
+
 [![Test Report](https://github.com/nesvand/aoc-solutions/actions/workflows/ci.yml/badge.svg)](https://github.com/nesvand/aoc-solutions/actions/workflows/ci.yml)
 
 A template for [Advent of Code](https://adventofcode.com) written in Typescript with Node.
 
-(Adapted from https://github.com/nesvand/aoc-solutions/actions/workflows/ci.yml)
+(Adapted from https://github.com/ljgago - repo not available)
 
 ## Usage
 
@@ -36,13 +37,13 @@ This command generates these files:
     * creating src/day01/README.md
     * creating test/day01.test.spec.ts
 
-- `/src/day01/resources/input.txt`: the input data.
-- `/src/day01/index.ts`: export the modules for testing.
-- `/src/day01/main.ts`: the main module.
-- `/src/day01/part1.ts`: solution for part 1.
-- `/src/day01/part2.ts`: solution for part 2.
-- `/src/day01/README.md`: you can write the challenge statement.
-- `/tests/day01.test.spec.ts`: the module where you write the tests.
+-   `/src/day01/resources/input.txt`: the input data.
+-   `/src/day01/index.ts`: export the modules for testing.
+-   `/src/day01/main.ts`: the main module.
+-   `/src/day01/part1.ts`: solution for part 1.
+-   `/src/day01/part2.ts`: solution for part 2.
+-   `/src/day01/README.md`: you can write the challenge statement.
+-   `/tests/day01.test.spec.ts`: the module where you write the tests.
 
 ## Config
 
@@ -74,6 +75,7 @@ Folder structure:
 Happy coding!
 
 ## Additional Credits
+
 `StringView` is adapted from [sv](https://github.com/tsoding/sv) by [Alexey Kutepov](https://github.com/tsoding).
 
 [MIT License](LICENSE)
