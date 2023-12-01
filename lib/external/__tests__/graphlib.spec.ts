@@ -69,7 +69,7 @@ describe('@dagrejs/graphlib', () => {
 
             const pathToEnd = [end] satisfies NonEmptyArray<string>;
             let path = paths[end];
-            while (path && path.distance !== 0) {
+            while (path !== undefined && path.distance !== 0) {
                 pathToEnd.unshift(path.predecessor);
                 path = paths[path.predecessor];
             }

@@ -36,7 +36,10 @@ export const mapGetOrCreate = <K, V>(map: Map<K, V>, key: K, creator: Creator<V>
 };
 
 export const invert = <K extends keyof never, V extends keyof never>(map: Record<K, V>): Record<V, K> =>
-    Object.entries(map).reduce((inverted, [k, v]) => {
-        inverted[v as V] = k as K;
-        return inverted;
-    }, {} as Record<V, K>);
+    Object.entries(map).reduce(
+        (inverted, [k, v]) => {
+            inverted[v as V] = k as K;
+            return inverted;
+        },
+        {} as Record<V, K>
+    );
