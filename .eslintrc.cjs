@@ -20,7 +20,10 @@ const config = {
         ecmaVersion: "latest",
         sourceType: "module",
     },
-    rules: {},
+    rules: {
+        "@typescript-eslint/explicit-function-return-type": "off",
+    },
+    ignorePatterns: [".eslintrc.cjs", "jest.config.js", "prettier.config.mjs"],
 };
 
 module.exports = config;

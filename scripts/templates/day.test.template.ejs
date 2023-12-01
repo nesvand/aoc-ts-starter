@@ -1,5 +1,6 @@
 // Advent of Code - Day <%= data.dayNumber %>
 import { readFileSync } from 'fs';
+import { part1, part2 } from '../src/<%= data.dayName %>';
 
 let input = '';
 try {
@@ -8,13 +9,11 @@ try {
     // ignore
 }
 
-import { part1, part2 } from '../src/<%= data.dayName %>';
-
 test('part one test', () => {
     expect(part1(``)).toBe(0);
 });
 
-if (input) {
+if (input !== '') {
     test('part one answer', () => {
         expect(part1(input)).toBe(0);
     });
@@ -24,7 +23,7 @@ test('part two test', () => {
     expect(part2(``)).toBe(0);
 });
 
-if (input) {
+if (input !== '') {
     test('part two answer', () => {
         expect(part2(input)).toBe(0);
     });
