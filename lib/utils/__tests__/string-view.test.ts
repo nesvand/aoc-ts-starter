@@ -171,8 +171,10 @@ describe('@lib/utils/string-view', () => {
 
             const sv = new StringView(data);
             const result: number[] = [];
-            while (sv.chopLeftWhile(isWhitespace) && sv.size > 0) {
+            sv.chopLeftWhile(isWhitespace);
+            while (sv.size > 0) {
                 result.push(sv.chopInt());
+                sv.chopLeftWhile(isWhitespace);
             }
 
             expect(result).toEqual(expected);

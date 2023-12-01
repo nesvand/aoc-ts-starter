@@ -1,6 +1,6 @@
 export class RingBuffer<T> {
     private _buffer: T[];
-    private _size: number;
+    private readonly _size: number;
     private _pointer: number;
 
     constructor(size: number) {

@@ -12,6 +12,7 @@ describe('heapjs', () => {
         });
 
         test('should create a max heap', () => {
+            // eslint-disable-next-line @typescript-eslint/unbound-method
             const maxHeap = new Heap(Heap.maxComparator);
             maxHeap.init([5, 18, 1]);
             maxHeap.push(2);
@@ -32,12 +33,12 @@ describe('heapjs', () => {
 
         test('should be able to process async', async () => {
             type CustomPriority = { priority: number };
-            const asyncHeap = new HeapAsync((a: CustomPriority, b: CustomPriority) => Promise.resolve(a.priority - b.priority));
+            const asyncHeap = new HeapAsync(async (a: CustomPriority, b: CustomPriority) => a.priority - b.priority);
             await asyncHeap.init([{ priority: 5 }, { priority: 18 }, { priority: 1 }]);
             await asyncHeap.push({ priority: 2 });
-            expect(await asyncHeap.peek()).toStrictEqual({ priority: 1 });
+            expect(asyncHeap.peek()).toStrictEqual({ priority: 1 });
             expect(await asyncHeap.pop()).toStrictEqual({ priority: 1 });
-            expect(await asyncHeap.peek()).toStrictEqual({ priority: 2 });
+            expect(asyncHeap.peek()).toStrictEqual({ priority: 2 });
         });
     });
 });

@@ -36,10 +36,10 @@ export function extract<C extends Choppers[]>(parts: TemplateStringsArray, ...pa
         const result: any = [];
         for (let i = 0; i < parsers.length; i++) {
             const part = parts[i];
-            if (!part) throw new ReferenceError('Part not found');
+            if (part === undefined) throw new ReferenceError('Part not found');
             input.chopByStringView(new StringView(part));
             const parser = parsers[i];
-            if (!parser) throw new ReferenceError('Parser not found');
+            if (parser === undefined) throw new ReferenceError('Parser not found');
             result.push(parser()(input));
         }
         return result;

@@ -22,6 +22,7 @@ const config = {
     },
     rules: {
         '@typescript-eslint/explicit-function-return-type': 'off',
+        '@typescript-eslint/consistent-type-definitions': 'off',
     },
     ignorePatterns: ['.eslintrc.cjs', 'jest.config.js', 'prettier.config.mjs'],
 };

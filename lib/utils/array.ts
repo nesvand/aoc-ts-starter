@@ -22,14 +22,14 @@ export const from = <T = undefined>(size: number, creator?: (v: T, k: number) =>
     return Array.from({ length: size }, creator ?? (() => undefined as unknown as T));
 };
 
-export const zip = <T>(arr1: T[], arr2: T[]): [T | undefined, T | undefined][] => {
+export const zip = <T>(arr1: T[], arr2: T[]): Array<[T | undefined, T | undefined]> => {
     const maxLength = Math.max(arr1.length, arr2.length);
 
     return from(maxLength, (_, i) => [arr1[i], arr2[i]]);
 };
 
 export const splitOn = <T>(arr: T[], predicate: (v: T, i: number) => boolean): T[][] => {
-    return arr.reduce(
+    return arr.reduce<T[][]>(
         (chunks, item, i) => {
             if (predicate(item, i)) {
                 chunks.push([]);
@@ -39,12 +39,12 @@ export const splitOn = <T>(arr: T[], predicate: (v: T, i: number) => boolean): T
 
             return chunks;
         },
-        [[]] as T[][]
+        [[]]
     );
 };
 
 export const chunk = <T>(arr: T[], size: number): T[][] => {
-    return arr.reduce((chunks, item) => {
+    return arr.reduce<T[][]>((chunks, item) => {
         const currentChunk = lastItem(chunks);
 
         if (isArray(currentChunk) && currentChunk.length < size) {
@@ -54,7 +54,7 @@ export const chunk = <T>(arr: T[], size: number): T[][] => {
         }
 
         return chunks;
-    }, [] as T[][]);
+    }, []);
 };
 
 export const rollingWindow = <T>(arr: T[], size: number): T[][] => {
