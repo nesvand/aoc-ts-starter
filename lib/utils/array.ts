@@ -39,7 +39,7 @@ export const splitOn = <T>(arr: T[], predicate: (v: T, i: number) => boolean): T
 
             return chunks;
         },
-        [[]]
+        [[]],
     );
 };
 

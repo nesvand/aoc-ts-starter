@@ -1,4 +1,5 @@
-import { hexToPaddedBinary, bitStringToNumber, bitsToNumber, bitSubstring, type Bit } from '@lib/utils/bits';
+import { describe, expect, test } from 'bun:test';
+import { type Bit, bitStringToNumber, bitSubstring, bitsToNumber, hexToPaddedBinary } from '@lib/utils/bits';
 
 describe('@lib/utils/bits', () => {
     describe('hexToPaddedBinary', () => {
@@ -27,9 +28,9 @@ describe('@lib/utils/bits', () => {
                 { hex: 'E', binary: '1110' },
                 { hex: 'F', binary: '1111' },
             ];
-            testValues.forEach(({ hex, binary }) => {
+            for (const { hex, binary } of testValues) {
                 expect(hexToPaddedBinary(hex)).toBe(binary);
-            });
+            }
         });
     });
 
@@ -53,9 +54,9 @@ describe('@lib/utils/bits', () => {
                 { bits: '1110', number: 14 },
                 { bits: '1111', number: 15 },
             ];
-            testValues.forEach(({ bits, number }) => {
+            for (const { bits, number } of testValues) {
                 expect(bitStringToNumber(bits)).toBe(number);
-            });
+            }
         });
     });
 
@@ -79,9 +80,9 @@ describe('@lib/utils/bits', () => {
                 { bits: [1, 1, 1, 0], number: 14 },
                 { bits: [1, 1, 1, 1], number: 15 },
             ];
-            testValues.forEach(({ bits, number }) => {
+            for (const { bits, number } of testValues) {
                 expect(bitsToNumber(bits)).toBe(number);
-            });
+            }
         });
     });
 
@@ -105,9 +106,9 @@ describe('@lib/utils/bits', () => {
                 { bits: '1110', start: 2, end: 4, number: 2 },
                 { bits: '1111', start: 2, end: 4, number: 3 },
             ];
-            testValues.forEach(({ bits, start, end, number }) => {
+            for (const { bits, start, end, number } of testValues) {
                 expect(bitSubstring(bits, start, end)).toBe(number);
-            });
+            }
         });
     });
 });

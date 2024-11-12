@@ -1,9 +1,9 @@
-import { access, mkdir, readFile, writeFile } from 'fs/promises';
-import path from 'path';
-import fetch from 'node-fetch';
+import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+import chalk from 'chalk';
 import dotenv from 'dotenv';
 import * as ejs from 'ejs';
-import chalk from 'chalk';
+import fetch from 'node-fetch';
 import z from 'zod';
 import { fromZodError } from 'zod-validation-error';
 
@@ -21,8 +21,8 @@ const inputTargetPath = (dayName: string): string => `src/${dayName}/resources/i
 
 const pipeAsync =
     (...funcs: CallableFunction[]) =>
-    (input: any) =>
-        funcs.reduce(async (v: any, func: CallableFunction) => func(await v), input);
+    (input: unknown) =>
+        funcs.reduce(async (v: unknown, func: CallableFunction) => func(await v), input);
 
 // check it the file exists or not
 const filePathExists = async (file: string): Promise<boolean> =>
@@ -42,17 +42,15 @@ type TemplateData = {
 
 // rendered the template with the data
 function renderTemplate(templateData: TemplateData) {
-    return async function (content: string) {
-        return ejs.render(content, { data: templateData }, { async: true });
-    };
+    return async (content: string) => ejs.render(content, { data: templateData }, { async: true });
 }
 
 // create the file with the rendered content
 function createFile(filename: string) {
-    return async function (content: string) {
+    return async (content: string) => {
         const fileExists = await filePathExists(filename);
         if (fileExists) {
-            console.log(chalk.yellow('* ignoring ') + `${filename} already exists`);
+            console.log(`${chalk.yellow('* ignoring ')}${filename} already exists`);
             return;
         }
 
@@ -67,7 +65,7 @@ function createFile(filename: string) {
         }
 
         await writeFile(filename, content);
-        console.log(chalk.green('* creating ') + `${filename}`);
+        console.log(`${chalk.green('* creating ')}${filename}`);
     };
 }
 
@@ -79,18 +77,18 @@ const envSchema = z.object({
 // return the default year
 function defaultYear(): number {
     const today = new Date();
-    return today.getMonth() == 11 ? today.getFullYear() : today.getFullYear() - 1;
+    return today.getMonth() === 11 ? today.getFullYear() : today.getFullYear() - 1;
 }
 
 // fetch the puzzle input
 async function fetchPuzzleInput(year: number, day: number, session: string) {
-    if (session != '') {
+    if (session !== '') {
         const url = `https://adventofcode.com/${year}/day/${day}/input`;
         const headers = { cookie: `session=${session}` };
 
         try {
             const content = await fetch(url, { headers });
-            return content.status == 200 ? content.text() : '';
+            return content.status === 200 ? content.text() : '';
         } catch (err) {
             console.error(err);
         }
@@ -107,7 +105,7 @@ async function fetchPuzzleInput(year: number, day: number, session: string) {
 const DayArgumentValidator = /(?<=day)\d+(?!\w)/;
 
 // run the main routine
-(async function () {
+(async () => {
     dotenv.config();
 
     const env = envSchema.safeParse(process.env);
@@ -118,7 +116,7 @@ const DayArgumentValidator = /(?<=day)\d+(?!\w)/;
 
     // check if exists one only argument
     const dayName = process.argv[2];
-    if (process.argv.length != 3) {
+    if (process.argv.length !== 3) {
         console.log('--- `npm run gen` needs one only argument ---');
         return;
     }
@@ -128,9 +126,9 @@ const DayArgumentValidator = /(?<=day)\d+(?!\w)/;
     }
 
     const dayValues = DayArgumentValidator.exec(dayName) || [];
-    const dayNumber = dayValues.length == 1 ? parseInt(dayValues[0]) : 0;
+    const dayNumber = dayValues.length === 1 ? Number.parseInt(dayValues[0]) : 0;
 
-    if (dayNumber == 0 || isNaN(dayNumber)) {
+    if (dayNumber === 0 || Number.isNaN(dayNumber)) {
         console.log('--- The argument must be `day + NUM` (e.g. day01) ---');
         return;
     }
@@ -148,9 +146,9 @@ const DayArgumentValidator = /(?<=day)\d+(?!\w)/;
         await createFile(inputTargetPath(dayName))(puzzleInput);
 
         // create and render the template files
-        templateTargets(dayName).forEach(([templatePath, targetPath]) => {
+        for (const [templatePath, targetPath] of templateTargets(dayName)) {
             pipeAsync(readTemplate, renderTemplate(data), createFile(targetPath))(templatePath);
-        });
+        }
     } catch (err) {
         console.error(err);
     }

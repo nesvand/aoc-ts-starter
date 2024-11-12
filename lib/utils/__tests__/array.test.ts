@@ -1,19 +1,20 @@
+import { describe, expect, it } from 'bun:test';
 import {
-    sort,
-    sortby,
-    sum,
-    product,
-    max,
+    asNumbers,
+    chunk,
+    from,
     isArray,
     lastIndex,
     lastItem,
     lastItems,
-    asNumbers,
-    from,
-    zip,
-    splitOn,
-    chunk,
+    max,
+    product,
     rollingWindow,
+    sort,
+    sortby,
+    splitOn,
+    sum,
+    zip,
 } from '@lib/utils/array';
 
 describe('@lib/utils/array', () => {

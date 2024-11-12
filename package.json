@@ -4,41 +4,30 @@
     "description": "Typescript solutions for Advent of Code 2024",
     "scripts": {
         "test": "scripts/test.sh",
-        "gen": "tsx scripts/gen.ts",
+        "gen": "bun scripts/gen.ts",
         "start": "scripts/start.sh",
         "coverage": "bun test --coverage"
     },
-    "keywords": [
-        "aoc",
-        "node",
-        "typescript",
-        "advent-of-code",
-        "bun"
-    ],
+    "keywords": ["aoc", "node", "typescript", "advent-of-code", "bun"],
     "author": "Andrew Nesvadba <nesvand@gmail.com>k",
     "license": "MIT",
     "dependencies": {
-        "@dagrejs/graphlib": "^2.1.13",
-        "heap-js": "^2.3.0",
-        "nerdamer": "^1.1.13",
-        "remeda": "^1.29.0"
+        "@dagrejs/graphlib": "2.2.4",
+        "heap-js": "2.5.0",
+        "nerdamer": "1.1.13",
+        "remeda": "2.17.0"
     },
     "devDependencies": {
-        "@types/node": "^18.18.14",
-        "chalk": "^5.3.0",
-        "dotenv": "^16.3.1",
-        "node-fetch": "^3.3.2",
-        "typescript": "^5.3.2",
-        "zod": "^3.22.4",
-        "zod-validation-error": "^2.1.0"
-    },
-    "jest-junit": {
-        "outputDirectory": "coverage",
-        "outputName": "jest-junit.xml",
-        "ancestorSeparator": " › ",
-        "uniqueOutputName": "false",
-        "suiteNameTemplate": "{filepath}",
-        "classNameTemplate": "{classname}",
-        "titleTemplate": "{title}"
+        "@biomejs/biome": "1.9.4",
+        "@types/bun": "1.1.13",
+        "@types/ejs": "3.1.5",
+        "@types/node": "22.9.0",
+        "chalk": "5.3.0",
+        "dotenv": "16.4.5",
+        "ejs": "3.1.10",
+        "node-fetch": "3.3.2",
+        "typescript": "5.6.3",
+        "zod": "3.23.8",
+        "zod-validation-error": "3.4.0"
     }
 }

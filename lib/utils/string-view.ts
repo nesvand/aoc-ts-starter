@@ -26,7 +26,14 @@ export function isWhitespace(char?: string) {
     }
 
     return (
-        char === ' ' || char === '\n' || char === '\t' || char === '\r' || char === '\f' || char === '\v' || char === '\u00A0' || char === '\uFEFF'
+        char === ' ' ||
+        char === '\n' ||
+        char === '\t' ||
+        char === '\r' ||
+        char === '\f' ||
+        char === '\v' ||
+        char === '\u00A0' ||
+        char === '\uFEFF'
     );
 }
 
@@ -134,24 +141,26 @@ export class StringView {
     }
 
     public chopLeft(size: number) {
-        if (size > this.data.length) {
-            size = this.data.length;
+        let _size = size;
+        if (_size > this.data.length) {
+            _size = this.data.length;
         }
 
-        const result = StringView.fromParts(this._source, this.start, size);
-        this.start += size;
-        this.size -= size;
+        const result = StringView.fromParts(this._source, this.start, _size);
+        this.start += _size;
+        this.size -= _size;
 
         return result;
     }
 
     public chopRight(size: number) {
-        if (size > this.data.length) {
-            size = this.data.length;
+        let _size = size;
+        if (_size > this.data.length) {
+            _size = this.data.length;
         }
 
-        const result = StringView.fromParts(this._source, this.start + this.size - size, size);
-        this.size -= size;
+        const result = StringView.fromParts(this._source, this.start + this.size - _size, _size);
+        this.size -= _size;
 
         return result;
     }
@@ -222,7 +231,7 @@ export class StringView {
         } else if (this.data.charAt(0) === '+') offset = 1;
 
         for (let i = 0 + offset; i < this.data.length && isDigit(this.data.charAt(i)); i++) {
-            result = result * 10 + parseInt(this.data.charAt(i));
+            result = result * 10 + Number.parseInt(this.data.charAt(i));
         }
 
         return result * sign;
@@ -246,9 +255,9 @@ export class StringView {
             } else {
                 if (decimal > 0.0) {
                     decimal *= 0.1;
-                    result += decimal * parseInt(this.data.charAt(i));
+                    result += decimal * Number.parseInt(this.data.charAt(i));
                 } else {
-                    result = result * 10 + parseInt(this.data.charAt(i));
+                    result = result * 10 + Number.parseInt(this.data.charAt(i));
                 }
             }
         }
@@ -269,7 +278,7 @@ export class StringView {
 
         let result = 0;
         while (this.size > 0 && isDigit(this.charAt(0))) {
-            result = result * 10 + parseInt(this.charAt(0));
+            result = result * 10 + Number.parseInt(this.charAt(0));
             this.start++;
             this.size--;
         }
@@ -299,9 +308,9 @@ export class StringView {
             } else {
                 if (decimal > 0.0) {
                     decimal *= 0.1;
-                    result += decimal * parseInt(this.charAt(0));
+                    result += decimal * Number.parseInt(this.charAt(0));
                 } else {
-                    result = result * 10 + parseInt(this.charAt(0));
+                    result = result * 10 + Number.parseInt(this.charAt(0));
                 }
             }
 

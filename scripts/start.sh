@@ -2,4 +2,4 @@
 set -xe
 
 DAY=$1
-tsx "./src/${DAY}/main.ts"
+bun "./src/${DAY}/main.ts"

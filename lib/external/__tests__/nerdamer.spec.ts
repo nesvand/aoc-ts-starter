@@ -1,4 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+import { describe, expect, test } from 'bun:test';
 const nerdamer = require('nerdamer/all');
 
 describe('nerdamer', () => {
