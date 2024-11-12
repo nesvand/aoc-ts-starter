@@ -1,19 +1,16 @@
 // Advent of Code - Day <%= data.dayNumber %>
-import { readFile } from "fs/promises";
-import { part1, part2 } from ".";
+import { readFile } from 'node:fs/promises';
+import { part1, part2 } from '.';
 
-void (async function () {
+void (async () => {
     try {
-        const input: string = await readFile(
-            "src/<%= data.dayName %>/resources/input.txt",
-            "utf8"
-        );
+        const input: string = await readFile('src/<%= data.dayName %>/resources/input.txt', 'utf8');
 
-        console.log("--- Part One ---");
-        console.log("Result", part1(input));
+        console.log('--- Part One ---');
+        console.log('Result', part1(input));
 
-        console.log("--- Part Two ---");
-        console.log("Result", part2(input));
+        console.log('--- Part Two ---');
+        console.log('Result', part2(input));
     } catch (err) {
         console.error(err);
     }
