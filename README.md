@@ -8,24 +8,27 @@ A template for [Advent of Code](https://adventofcode.com) written in Typescript 
 
 ## Usage
 
-The project uses [Node.js](https://nodejs.org) for the javascript runtime, [pnpm](https://pnpm.io) for the package manager, and [Jest](https://jestjs.io) with [ts-jest](https://github.com/kulshekhar/ts-jest) for testing.
+The project uses [Bun](https://bun.sh) for the javascript runtime, package manager, and for testing.
 
 ```bash
-git clone https://github.com/nesvand/aoc-solutions
-cd aoc-solutions
+git clone https://github.com/nesvand/aoc-ts-starter
+cd aoc-ts-starter
 # install dependencies
-pnpm install
+bun install
+# ensure you have AOC_SESSION and/or AOC_YEAR set as environment variables accordingly
+# generate files for day01
+bun gen day01
 # run tests for day01
-pnpm test day01
+bun test day01
 # run day01
-pnpm start day01
+bun start day01
 ```
 
 ## Generate
 
 You can generate all necessary files for use in the event with a simple command:
 
-    $ pnpm gen day01
+    $ bun gen day01
 
 This command generates these files:
 
@@ -54,7 +57,7 @@ You can to get the session token from the cookie web browser.
 
 Also can you set the `AOC_YEAR` to select a certain year.
 
-(It is not mandatory use the `AOC_YEAR`, the `pnpm gen` can get the year automatically)
+(It is not mandatory use the `AOC_YEAR`, the `bun gen` can get the year automatically)
 
 You can set an `.env` file with these variables.
 

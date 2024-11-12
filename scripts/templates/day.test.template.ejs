@@ -1,5 +1,6 @@
 // Advent of Code - Day <%= data.dayNumber %>
-import { readFileSync } from 'fs';
+import { expect, test } from 'bun:test';
+import { readFileSync } from 'node:fs';
 import { part1, part2 } from '../src/<%= data.dayName %>';
 
 let input = '';
@@ -10,6 +11,7 @@ try {
 }
 
 test('part one test', () => {
+    // biome-ignore lint/style/noUnusedTemplateLiteral: <explanation>
     expect(part1(``)).toBe(0);
 });
 
@@ -20,6 +22,7 @@ if (input !== '') {
 }
 
 test('part two test', () => {
+    // biome-ignore lint/style/noUnusedTemplateLiteral: <explanation>
     expect(part2(``)).toBe(0);
 });
 

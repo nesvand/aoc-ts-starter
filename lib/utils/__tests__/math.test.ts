@@ -1,12 +1,13 @@
-import { isNumber, mod, lerpAngle, lerp, clamp, mapRange } from '@lib/utils/math';
+import { describe, expect, test } from 'bun:test';
+import { clamp, isNumber, lerp, lerpAngle, mapRange, mod } from '@lib/utils/math';
 
 describe('@lib/utils/math', () => {
     describe('isNumber', () => {
         test('should return true for numbers', () => {
             const testValues = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-            testValues.forEach((value) => {
+            for (const value of testValues) {
                 expect(isNumber(value)).toBe(true);
-            });
+            }
         });
     });
 

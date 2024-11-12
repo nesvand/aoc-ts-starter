@@ -1,6 +1,5 @@
 export const isDefined = <T>(v: T | undefined | null): v is T => typeof v !== 'undefined' && v !== null;
 
-// eslint-disable-next-line @typescript-eslint/return-await
 export const wait = async (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const times = <T>(n: number, operation: () => T): T[] => {
@@ -37,8 +36,11 @@ export const mapGetOrCreate = <K, V>(map: Map<K, V>, key: K, creator: Creator<V>
 };
 
 export const invert = (map: Record<string | number | symbol, string | number | symbol>) => {
-    return Object.entries(map).reduce<Record<string | number | symbol, string | number | symbol>>((inverted, [k, v]) => {
-        inverted[v] = k;
-        return inverted;
-    }, {});
+    return Object.entries(map).reduce<Record<string | number | symbol, string | number | symbol>>(
+        (inverted, [k, v]) => {
+            inverted[v] = k;
+            return inverted;
+        },
+        {},
+    );
 };

@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'bun:test';
 import { Heap, HeapAsync } from 'heap-js';
 
 describe('heapjs', () => {
@@ -12,7 +13,6 @@ describe('heapjs', () => {
         });
 
         test('should create a max heap', () => {
-            // eslint-disable-next-line @typescript-eslint/unbound-method
             const maxHeap = new Heap(Heap.maxComparator);
             maxHeap.init([5, 18, 1]);
             maxHeap.push(2);

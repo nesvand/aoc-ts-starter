@@ -1,4 +1,5 @@
-import { Graph, alg, type Edge } from '@dagrejs/graphlib';
+import { describe, expect, test } from 'bun:test';
+import { type Edge, Graph, alg } from '@dagrejs/graphlib';
 
 describe('@dagrejs/graphlib', () => {
     describe('examples', () => {
@@ -67,7 +68,7 @@ describe('@dagrejs/graphlib', () => {
             const weight = (e: Edge) => g.edge(e)?.weight ?? 0;
             const paths = alg.dijkstra(g, start, weight);
 
-            const pathToEnd = [end] satisfies NonEmptyArray<string>;
+            const pathToEnd: NonEmptyArray<string> = [end];
             let path = paths[end];
             while (path !== undefined && path.distance !== 0) {
                 pathToEnd.unshift(path.predecessor);

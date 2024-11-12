@@ -3,7 +3,7 @@ set -xe
 
 DAY=$1
 if [ -z "$DAY" ]; then
-    jest --
+    bun test
 else
-    jest "./test/${DAY}.test.ts"
+    bun test "./test/${DAY}.test.ts"
 fi

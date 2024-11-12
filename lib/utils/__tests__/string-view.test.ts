@@ -1,4 +1,5 @@
-import { StringView, isWhitespace, isDigit } from '@lib/utils/string-view';
+import { describe, expect, test } from 'bun:test';
+import { StringView, isDigit, isWhitespace } from '@lib/utils/string-view';
 
 describe('@lib/utils/string-view', () => {
     describe('StringView', () => {
@@ -56,7 +57,11 @@ describe('@lib/utils/string-view', () => {
 
         test('takeLeftWhile', () => {
             const sv = new StringView('1234test');
-            expect(sv.takeLeftWhile((char) => typeof char !== 'undefined' && ['1', '2', '3', '4'].includes(char)).toString()).toBe('1234');
+            expect(
+                sv
+                    .takeLeftWhile((char) => typeof char !== 'undefined' && ['1', '2', '3', '4'].includes(char))
+                    .toString(),
+            ).toBe('1234');
             expect(sv.toString()).toBe('1234test');
         });
 
@@ -161,7 +166,11 @@ describe('@lib/utils/string-view', () => {
 
         test('chopLeftWhile', () => {
             const sv = new StringView('1234test');
-            expect(sv.chopLeftWhile((char) => typeof char !== 'undefined' && ['1', '2', '3', '4'].includes(char)).toString()).toBe('1234');
+            expect(
+                sv
+                    .chopLeftWhile((char) => typeof char !== 'undefined' && ['1', '2', '3', '4'].includes(char))
+                    .toString(),
+            ).toBe('1234');
             expect(sv.toString()).toBe('test');
         });
 

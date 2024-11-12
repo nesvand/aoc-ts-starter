@@ -1,5 +1,6 @@
-import { extract, int, word, float } from '@lib/utils/strings';
+import { describe, expect, test } from 'bun:test';
 import { StringView } from '@lib/utils/string-view';
+import { extract, float, int, word } from '@lib/utils/strings';
 
 describe('@lib/utils/strings', () => {
     describe('extract', () => {

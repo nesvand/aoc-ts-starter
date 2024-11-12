@@ -59,7 +59,7 @@ export const colorToHexString = (color: Color): string => {
  */
 export const hexStringToColor = (hex: string): Color => {
     const removeHash = hex.replace('#', '');
-    const hexNumber = parseInt(removeHash, 16);
+    const hexNumber = Number.parseInt(removeHash, 16);
     const color = hexToColor(hexNumber);
     color.a = 1;
     return color;
