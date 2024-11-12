@@ -21,7 +21,7 @@ jobs:
         run: bun run coverage
 
       - name: Test Report
-        uses: vebr/jest-lcov-reporter@v0.2.0
+        uses: lifeart/jest-lcov-reporter@v0.4.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           lcov-file: ./coverage/lcov.info
