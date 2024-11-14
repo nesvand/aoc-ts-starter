@@ -6,7 +6,7 @@ export const sum = (a: number[]) => a.reduce((sum, n) => sum + n, 0);
 
 export const product = (a: number[]) => a.reduce((p, n) => p * n, 1);
 
-export const max = (a: number[]) => Math.max(...a);
+export const max = (a: number[]) => a.reduce((max, n) => Math.max(max, n), Number.NEGATIVE_INFINITY);
 
 export const isArray = (values: unknown): values is unknown[] => Array.isArray(values);
 
@@ -34,9 +34,9 @@ export const splitOn = <T>(arr: T[], predicate: (v: T, i: number) => boolean): T
             if (predicate(item, i)) {
                 chunks.push([]);
             } else {
-                lastItem(chunks)?.push(item);
+                const currentChunkIndex = chunks.length - 1;
+                chunks[currentChunkIndex]?.push(item);
             }
-
             return chunks;
         },
         [[]],
@@ -58,13 +58,8 @@ export const chunk = <T>(arr: T[], size: number): T[][] => {
 };
 
 export const rollingWindow = <T>(arr: T[], size: number): T[][] => {
-    if (size <= 0 || arr.length < size) return [] as T[][];
+    if (size <= 0 || arr.length < size) return [];
 
-    const result: T[][] = [];
-
-    for (let i = 0; i < arr.length - size + 1; i++) {
-        result.push(arr.slice(i, i + size));
-    }
-
-    return result;
+    const windowCount = arr.length - size + 1;
+    return Array.from({ length: windowCount }, (_, i) => arr.slice(i, i + size));
 };
