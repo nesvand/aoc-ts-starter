@@ -5,7 +5,7 @@ import { hideBin } from 'yargs/helpers';
 
 export type TestCase = {
     name: string;
-    // biome-ignore lint/complexity/noBannedTypes: Allowed for testing
+    // biome-ignore lint/complexity/noBannedTypes: We don't care about the types here, just the shape
     fn: Function;
     setup: () => unknown;
 };
