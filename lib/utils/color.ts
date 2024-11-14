@@ -1,5 +1,9 @@
 import * as math from '@lib/utils/math';
 
+const BYTE_SCALE = 255;
+const BYTE_MASK = 0xff;
+const INV_BYTE_SCALE = 1 / BYTE_SCALE;
+
 export interface Color {
     r: number;
     g: number;
@@ -16,33 +20,33 @@ export const lerpColor = (a: Color, b: Color, t: number): Color => {
 };
 
 export const colorToHex = (color: Color): number => {
-    const r = Math.round(color.r * 255);
-    const g = Math.round(color.g * 255);
-    const b = Math.round(color.b * 255);
-    const a = Math.round(color.a * 255);
+    const r = Math.round(color.r * BYTE_SCALE);
+    const g = Math.round(color.g * BYTE_SCALE);
+    const b = Math.round(color.b * BYTE_SCALE);
+    const a = Math.round(color.a * BYTE_SCALE);
     return a * (1 << 24) + ((r << 16) | (g << 8) | b);
 };
 
 export const hexToColor = (hex: number): Color => {
-    const a = (hex >> 24) & 0xff;
-    const r = (hex >> 16) & 0xff;
-    const g = (hex >> 8) & 0xff;
-    const b = hex & 0xff;
-    return { r: r / 255, g: g / 255, b: b / 255, a: a / 255 };
+    const a = (hex >> 24) & BYTE_MASK;
+    const r = (hex >> 16) & BYTE_MASK;
+    const g = (hex >> 8) & BYTE_MASK;
+    const b = hex & BYTE_MASK;
+    return { r: r * INV_BYTE_SCALE, g: g * INV_BYTE_SCALE, b: b * INV_BYTE_SCALE, a: a * INV_BYTE_SCALE };
 };
 
 export const colorToRGBAString = (color: Color): string => {
-    const r = Math.round(color.r * 255);
-    const g = Math.round(color.g * 255);
-    const b = Math.round(color.b * 255);
-    const a = Math.round(color.a * 255);
+    const r = Math.round(color.r * BYTE_SCALE);
+    const g = Math.round(color.g * BYTE_SCALE);
+    const b = Math.round(color.b * BYTE_SCALE);
+    const a = Math.round(color.a * BYTE_SCALE);
     return `rgba(${r}, ${g}, ${b}, ${a})`;
 };
 
 export const colorToRGBString = (color: Color): string => {
-    const r = Math.round(color.r * 255);
-    const g = Math.round(color.g * 255);
-    const b = Math.round(color.b * 255);
+    const r = Math.round(color.r * BYTE_SCALE);
+    const g = Math.round(color.g * BYTE_SCALE);
+    const b = Math.round(color.b * BYTE_SCALE);
     return `rgb(${r}, ${g}, ${b})`;
 };
 
