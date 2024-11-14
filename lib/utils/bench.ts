@@ -98,6 +98,7 @@ export function parseArgs(args: string[]): { functionName: string; options: Benc
     };
 
     for (let i = 1; i < args.length; i += 2) {
+        // biome-ignore lint/style/noNonNullAssertion: If we fail, we fail
         const value = Number.parseInt(args[i + 1]!);
         if (Number.isNaN(value)) {
             console.error(`Invalid value for ${args[i]}`);
