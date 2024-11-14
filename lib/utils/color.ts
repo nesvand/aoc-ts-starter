@@ -23,14 +23,11 @@ export const colorToHex = (color: Color): number => {
     return a * (1 << 24) + ((r << 16) | (g << 8) | b);
 };
 
-/**
- * @ignore Not working
- */
 export const hexToColor = (hex: number): Color => {
+    const a = (hex >> 24) & 0xff;
     const r = (hex >> 16) & 0xff;
     const g = (hex >> 8) & 0xff;
     const b = hex & 0xff;
-    const a = (hex >> 24) & 0xff;
     return { r: r / 255, g: g / 255, b: b / 255, a: a / 255 };
 };
 
@@ -54,13 +51,9 @@ export const colorToHexString = (color: Color): string => {
     return `#${hex.toString(16).slice(-6).padStart(6, '0')}`;
 };
 
-/**
- * @ignore Not working
- */
 export const hexStringToColor = (hex: string): Color => {
     const removeHash = hex.replace('#', '');
-    const hexNumber = Number.parseInt(removeHash, 16);
-    const color = hexToColor(hexNumber);
-    color.a = 1;
-    return color;
+    const hexWithAlpha = `ff${removeHash}`;
+    const hexNumber = Number.parseInt(hexWithAlpha, 16);
+    return hexToColor(hexNumber);
 };

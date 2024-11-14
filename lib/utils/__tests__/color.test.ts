@@ -41,11 +41,13 @@ describe('@lib/utils/color', () => {
         });
     });
 
-    // Not working
-    describe.skip('hexToColor', () => {
+    describe('hexToColor', () => {
         test('should convert a hex number to a color', () => {
             const c = hexToColor(0xff808080);
-            expect(c).toEqual({ r: 0.5, g: 0.5, b: 0.5, a: 1 });
+            expect(c.r).toBeCloseTo(0.5);
+            expect(c.g).toBeCloseTo(0.5);
+            expect(c.b).toBeCloseTo(0.5);
+            expect(c.a).toBeCloseTo(1.0);
         });
     });
 
@@ -85,10 +87,44 @@ describe('@lib/utils/color', () => {
         });
     });
 
-    describe.skip('hexStringToColor', () => {
+    describe('hexStringToColor', () => {
         test('should convert a hex string to a color', () => {
             const c = hexStringToColor('#808080');
-            expect(c).toEqual({ r: 0.5, g: 0.5, b: 0.5, a: 1 });
+            expect(c.r).toBeCloseTo(0.5);
+            expect(c.g).toBeCloseTo(0.5);
+            expect(c.b).toBeCloseTo(0.5);
+            expect(c.a).toBeCloseTo(1.0);
+        });
+    });
+
+    describe('compound conversions', () => {
+        test('hex string -> color -> hex string should preserve value', () => {
+            const original = '#808080';
+            const color = hexStringToColor(original);
+            const result = colorToHexString(color);
+            expect(result).toBe(original);
+        });
+
+        test('color -> hex number -> color should preserve values', () => {
+            const original: Color = { r: 0.5, g: 0.25, b: 0.75, a: 1 };
+            const hex = colorToHex(original);
+            const result = hexToColor(hex);
+            expect(result.r).toBeCloseTo(original.r);
+            expect(result.g).toBeCloseTo(original.g);
+            expect(result.b).toBeCloseTo(original.b);
+            expect(result.a).toBeCloseTo(original.a);
+        });
+
+        test('color -> rgba string -> hex -> color should preserve values', () => {
+            const original: Color = { r: 0.5, g: 0.25, b: 0.75, a: 0.5 };
+            const rgba = colorToRGBAString(original);
+            expect(rgba).toBe('rgba(128, 64, 191, 128)');
+            const hex = colorToHex(original);
+            const result = hexToColor(hex);
+            expect(result.r).toBeCloseTo(original.r);
+            expect(result.g).toBeCloseTo(original.g);
+            expect(result.b).toBeCloseTo(original.b);
+            expect(result.a).toBeCloseTo(original.a);
         });
     });
 });
