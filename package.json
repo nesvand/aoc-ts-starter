@@ -8,7 +8,13 @@
         "start": "scripts/start.sh",
         "coverage": "bun test --coverage"
     },
-    "keywords": ["aoc", "node", "typescript", "advent-of-code", "bun"],
+    "keywords": [
+        "aoc",
+        "node",
+        "typescript",
+        "advent-of-code",
+        "bun"
+    ],
     "author": "Andrew Nesvadba <nesvand@gmail.com>k",
     "license": "MIT",
     "dependencies": {
@@ -16,15 +22,17 @@
         "cli-progress": "^3.12.0",
         "heap-js": "2.5.0",
         "nerdamer": "1.1.13",
-        "remeda": "2.17.0"
+        "remeda": "2.17.0",
+        "yargs": "17.7.2"
     },
     "devDependencies": {
         "@biomejs/biome": "1.9.4",
         "@types/bun": "1.1.13",
-        "@types/cli-progress": "^3.11.6",
+        "@types/cli-progress": "3.11.6",
         "@types/ejs": "3.1.5",
         "@types/node": "22.9.0",
-        "chalk": "^5.3.0",
+        "@types/yargs": "17.0.33",
+        "chalk": "5.3.0",
         "dotenv": "16.4.5",
         "ejs": "3.1.10",
         "node-fetch": "3.3.2",

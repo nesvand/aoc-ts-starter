@@ -1,5 +1,7 @@
 import chalk from 'chalk';
 import cliProgress from 'cli-progress';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 
 export type TestCase = {
     name: string;
@@ -86,37 +88,35 @@ export function runBenchmark(testName: string, testCases: TestCase[], options: B
 }
 
 export function parseArgs(args: string[]): { functionName: string; options: BenchmarkOptions } {
-    const functionName = args[0];
-    if (!functionName) {
-        console.error("Please specify a function name");
-        process.exit(1);
-    }
+    const argv = yargs(hideBin(process.argv))
+        .usage('Usage: $0 <function-name> [options]')
+        .command('* <function-name>', 'Run benchmark for the specified function')
+        .positional('function-name', {
+            describe: 'Name of the function to benchmark',
+            type: 'string',
+            demandOption: true,
+        })
+        .option('warmup', {
+            alias: 'w',
+            type: 'number',
+            description: 'Number of warmup iterations',
+            default: 0,
+        })
+        .option('runs', {
+            alias: 'r',
+            type: 'number',
+            description: 'Number of benchmark runs',
+            default: 1000,
+        })
+        .help()
+        .alias('help', 'h')
+        .parseSync();
 
-    const options: BenchmarkOptions = {
-        warmup: 0,
-        runs: 1000,
+    return {
+        functionName: argv['function-name'],
+        options: {
+            warmup: argv.warmup,
+            runs: argv.runs,
+        },
     };
-
-    for (let i = 1; i < args.length; i += 2) {
-        // biome-ignore lint/style/noNonNullAssertion: If we fail, we fail
-        const value = Number.parseInt(args[i + 1]!);
-        if (Number.isNaN(value)) {
-            console.error(`Invalid value for ${args[i]}`);
-            process.exit(1);
-        }
-
-        switch (args[i]) {
-            case '--warmup':
-                options.warmup = value;
-                break;
-            case '--runs':
-                options.runs = value;
-                break;
-            default:
-                console.error(`Unknown option: ${args[i]}`);
-                process.exit(1);
-        }
-    }
-
-    return { functionName, options };
 } 
