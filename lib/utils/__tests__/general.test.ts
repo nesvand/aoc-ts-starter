@@ -30,15 +30,32 @@ describe('@lib/utils/general', () => {
     });
 
     describe('asyncTimes', () => {
-        test('calls the function the specified number of times', async () => {
+        test('calls the function the specified number of times sequentially', async () => {
             const fn = jest.fn();
+            const order: number[] = [];
+            const mockFn = async (i: number) => {
+                await wait(100);
+                order.push(i);
+                fn();
+            };
+            await asyncTimes(3, () => mockFn(order.length));
+            expect(fn).toHaveBeenCalledTimes(3);
+            expect(order).toEqual([0, 1, 2]); // Ensures sequential execution
+        });
+
+        test('calls the function in parallel when specified', async () => {
+            const fn = jest.fn();
+            const startTimes: number[] = [];
             const mockFn = async () => {
+                startTimes.push(Date.now());
                 await wait(100);
                 fn();
             };
-            const results = await asyncTimes(5, mockFn);
-            expect(fn).toHaveBeenCalledTimes(5);
-            expect(results.length).toBe(5);
+            await asyncTimes(3, mockFn, true);
+            expect(fn).toHaveBeenCalledTimes(3);
+            // All functions should start within a small time window
+            const timeSpread = Math.max(...startTimes) - Math.min(...startTimes);
+            expect(timeSpread).toBeLessThan(50);
         });
     });
 
@@ -52,9 +69,12 @@ describe('@lib/utils/general', () => {
             expect(actual).toEqual(expected);
         });
 
-        test('should throw an error if the value is undefined', () => {
+        test('should store undefined values in the map', () => {
             const map = new Map<string, unknown>();
-            expect(() => mapGetOrCreate(map, 'test', () => undefined)).toThrowError(ReferenceError);
+            const value = mapGetOrCreate(map, 'test', () => undefined);
+            expect(value).toBeUndefined();
+            expect(map.get('test')).toBeUndefined();
+            expect(map.has('test')).toBe(true);
         });
     });
 
@@ -67,6 +87,27 @@ describe('@lib/utils/general', () => {
             const expected = {
                 b: 'a',
                 d: 'c',
+            };
+            const actual = invert(map);
+            expect(actual).toEqual(expected);
+        });
+
+        test('should throw error on duplicate values', () => {
+            const map = {
+                a: 'b',
+                c: 'b',
+            };
+            expect(() => invert(map)).toThrow('Cannot invert map with duplicate values');
+        });
+
+        test('should handle numeric values', () => {
+            const map = {
+                a: 1,
+                b: 2,
+            };
+            const expected = {
+                1: 'a',
+                2: 'b',
             };
             const actual = invert(map);
             expect(actual).toEqual(expected);
