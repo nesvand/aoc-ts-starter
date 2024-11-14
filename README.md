@@ -84,13 +84,17 @@ bun run lib/utils/array.bench.ts <function-name> [options]
 ```
 
 Options:
-- `--warmup <n>`: Number of warmup iterations (default: 0)
-- `--runs <n>`: Number of benchmark runs (default: 1000)
+  -w, --warmup  Number of warmup iterations       [number] [default: 0]
+  -r, --runs    Number of benchmark runs          [number] [default: 1000]
+  -h, --help    Show help                         [boolean]
 
 Example:
 ```bash
 # Run 'max' function benchmark with 100 warmup iterations and 1000 runs
-bun run lib/utils/array.bench.ts max --warmup 100 --runs 1000
+bun run lib/utils/array.bench.ts max -w 100 -r 1000
+
+# Show help and available options
+bun run lib/utils/array.bench.ts --help
 ```
 
 To create benchmarks for your own functions:
@@ -111,11 +115,14 @@ const testCases: TestCase[] = [
 ```
 4. Run the benchmark:
 ```typescript
-const { functionName, options } = parseArgs(process.argv.slice(2));
+const { functionName, options } = parseArgs(process.argv);
 runBenchmark(functionName, testCases, options);
 ```
 
-The benchmark will display a progress bar during execution and output statistics including mean execution time, standard deviation, and min/max times.
+The benchmark will display a progress bar during execution and output statistics including:
+- Mean execution time with standard deviation
+- Min/max execution times
+- Number of runs and warmup iterations
 
 ## Additional Credits
 
