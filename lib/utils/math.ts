@@ -35,21 +35,15 @@ export const lerpAngle = (start: number, end: number, percent: number): number =
     if (percent === 0) return start;
     if (percent === 1 || percent === -1) return end;
 
-    // Normalize the percent to [0, 1] range using mod instead of clamp
     const normalizedPercent = mod(percent, 1);
 
-    // Normalize angles to [0, 2π]
     const normalizedStart = mod(start, Math.PI * 2);
     const normalizedEnd = mod(end, Math.PI * 2);
-
-    // Find shortest angle
     let diff = normalizedEnd - normalizedStart;
+
+    // Shorter path check
     if (Math.abs(diff) > Math.PI) {
-        if (normalizedEnd > normalizedStart) {
-            diff -= Math.PI * 2;
-        } else {
-            diff += Math.PI * 2;
-        }
+        diff += diff > 0 ? -Math.PI * 2 : Math.PI * 2;
     }
 
     return mod(normalizedStart + diff * normalizedPercent, Math.PI * 2);
@@ -62,7 +56,9 @@ export const lerpAngle = (start: number, end: number, percent: number): number =
  * @example mapRange(5, 0, 10, 100, 0) // 50
  */
 export const mapRange = (value: number, fromStart: number, fromEnd: number, toStart: number, toEnd: number): number => {
-    // Cache division result to avoid recalculation
-    const scale = (toEnd - toStart) / (fromEnd - fromStart);
+    const fromRange = fromEnd - fromStart;
+    if (fromRange === 0) throw new Error('fromStart and fromEnd cannot be equal');
+
+    const scale = (toEnd - toStart) / fromRange;
     return (value - fromStart) * scale + toStart;
 };
