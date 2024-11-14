@@ -37,24 +37,93 @@ const testCases: TestCase[] = [
     },
 ];
 
-function runBenchmark(testName?: string) {
-    const testCase = testCases.find(t => t.name === testName);
+type BenchmarkOptions = {
+    warmup: number;
+    runs: number;
+};
 
+type BenchmarkResult = {
+    mean: number;
+    stdDev: number;
+    min: number;
+    max: number;
+};
+
+function calculateStats(times: number[]): BenchmarkResult {
+    const mean = times.reduce((a, b) => a + b, 0) / times.length;
+    const variance = times.reduce((a, b) => a + (b - mean) ** 2, 0) / times.length;
+    return {
+        mean,
+        stdDev: Math.sqrt(variance),
+        min: Math.min(...times),
+        max: Math.max(...times),
+    };
+}
+
+function runBenchmark(testName: string, options: BenchmarkOptions) {
+    const testCase = testCases.find(t => t.name === testName);
     if (!testCase) {
         console.error(`No test case found for "${testName}"`);
         process.exit(1);
     }
 
     const data = testCase.setup();
-    testCase.fn(data);
-    process.exit(0);
+
+    // Warmup runs
+    for (let i = 0; i < options.warmup; i++) {
+        testCase.fn(data);
+    }
+
+    // Actual benchmark runs
+    const times: number[] = [];
+    for (let i = 0; i < options.runs; i++) {
+        const start = performance.now();
+        testCase.fn(data);
+        times.push(performance.now() - start);
+    }
+
+    const stats = calculateStats(times);
+    console.log({
+        test: testName,
+        ...stats,
+        runs: options.runs,
+        warmup: options.warmup,
+    });
 }
 
-// Get the function name from command line arguments
-const functionName = process.argv[2];
+// Parse command line arguments
+const args = process.argv.slice(2);
+const functionName = args[0];
 if (!functionName) {
     console.error("Please specify a function name");
     process.exit(1);
 }
 
-runBenchmark(functionName); 
+const options: BenchmarkOptions = {
+    warmup: 0,
+    runs: 1000,
+};
+
+// Parse --warmup and --runs options
+for (let i = 1; i < args.length; i += 2) {
+    // biome-ignore lint/style/noNonNullAssertion: Allowed for testing
+    const value = Number.parseInt(args[i + 1]!);
+    if (Number.isNaN(value)) {
+        console.error(`Invalid value for ${args[i]}`);
+        process.exit(1);
+    }
+
+    switch (args[i]) {
+        case '--warmup':
+            options.warmup = value;
+            break;
+        case '--runs':
+            options.runs = value;
+            break;
+        default:
+            console.error(`Unknown option: ${args[i]}`);
+            process.exit(1);
+    }
+}
+
+runBenchmark(functionName, options); 
