@@ -83,10 +83,12 @@ The project includes a benchmarking utility to measure the performance of your s
 bun run lib/utils/array.bench.ts <function-name> [options]
 ```
 
+```
 Options:
   -w, --warmup  Number of warmup iterations       [number] [default: 0]
   -r, --runs    Number of benchmark runs          [number] [default: 1000]
   -h, --help    Show help                         [boolean]
+```
 
 Example:
 ```bash
