@@ -75,6 +75,48 @@ Folder structure:
 
 Happy coding!
 
+## Benchmarking
+
+The project includes a benchmarking utility to measure the performance of your solutions. You can benchmark specific functions using:
+
+```bash
+bun run lib/utils/array.bench.ts <function-name> [options]
+```
+
+Options:
+- `--warmup <n>`: Number of warmup iterations (default: 0)
+- `--runs <n>`: Number of benchmark runs (default: 1000)
+
+Example:
+```bash
+# Run 'max' function benchmark with 100 warmup iterations and 1000 runs
+bun run lib/utils/array.bench.ts max --warmup 100 --runs 1000
+```
+
+To create benchmarks for your own functions:
+1. Create a new benchmark file (e.g., `myutils.bench.ts`)
+2. Import the benchmark utilities:
+```typescript
+import { type TestCase, runBenchmark, parseArgs } from "./bench";
+```
+3. Define your test cases:
+```typescript
+const testCases: TestCase[] = [
+    {
+        name: "myFunction",
+        fn: myFunction,
+        setup: () => yourTestData,
+    },
+];
+```
+4. Run the benchmark:
+```typescript
+const { functionName, options } = parseArgs(process.argv.slice(2));
+runBenchmark(functionName, testCases, options);
+```
+
+The benchmark will display a progress bar during execution and output statistics including mean execution time, standard deviation, and min/max times.
+
 ## Additional Credits
 
 `StringView` is adapted from [sv](https://github.com/tsoding/sv) by [Alexey Kutepov](https://github.com/tsoding).
