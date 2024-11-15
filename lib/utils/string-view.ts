@@ -51,6 +51,9 @@ export class StringView {
     // Cache segmenter and segments
     #segmenter?: Intl.Segmenter;
     #segments?: Array<{ segment: string; index: number; }>;
+    // Cache for computed values
+    #lengthInGraphemes?: number;
+    #trimmedIndices?: { start: number; end: number; };
 
     /**
      * Gets or creates the segmenter instance
@@ -218,7 +221,21 @@ export class StringView {
      * @returns A new StringView with all outer whitespace removed
      */
     public trim(): StringView {
-        return this.trimLeft().trimRight();
+        const { start, end } = this.getTrimmedIndices();
+        const segments = this.getSegments();
+        
+        if (start > end) {
+            return StringView.fromParts(this.#source, this.#start, 0);
+        }
+
+        const startSegment = segments[start];
+        if (!startSegment) throw new Error('Invalid segment index when creating StringView');
+        const startOffset = startSegment.index;
+        const endSegment = segments[end];
+        if (!endSegment) throw new Error('Invalid segment index when creating StringView');
+        const size = (endSegment.index + endSegment.segment.length) - startOffset;
+
+        return StringView.fromParts(this.#source, this.#start + startOffset, size);
     }
 
     /**
@@ -487,12 +504,12 @@ export class StringView {
 
     /**
      * Implements the iterator protocol for character-by-character iteration
-     * @yields Each character in the current view
+     * Uses cached segments for better performance
      */
     public *[Symbol.iterator](): Iterator<string> {
-        const chars = Array.from(this.data);
-        for (const char of chars) {
-            yield char;
+        const segments = this.getSegments();
+        for (const { segment } of segments) {
+            yield segment;
         }
     }
 
@@ -638,6 +655,33 @@ export class StringView {
 
         // Delimiter not found
         return { success: false };
+    }
+
+    /**
+     * Gets the length in graphemes, cached
+     */
+    get graphemeLength(): number {
+        if (this.#lengthInGraphemes === undefined) {
+            this.#lengthInGraphemes = this.getSegments().length;
+        }
+        return this.#lengthInGraphemes;
+    }
+
+    /**
+     * Gets the trimmed indices, cached
+     */
+    private getTrimmedIndices(): { start: number; end: number; } {
+        if (!this.#trimmedIndices) {
+            const segments = this.getSegments();
+            let start = 0;
+            let end = segments.length - 1;
+
+            while (start <= end && isWhitespace(segments[start]?.segment)) start++;
+            while (end >= start && isWhitespace(segments[end]?.segment)) end--;
+
+            this.#trimmedIndices = { start, end };
+        }
+        return this.#trimmedIndices;
     }
 }
 
