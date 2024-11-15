@@ -20,28 +20,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-export function isWhitespace(char?: string) {
-    if (char === undefined) {
-        return false;
-    }
-
-    return (
-        char === ' ' ||
-        char === '\n' ||
-        char === '\t' ||
-        char === '\r' ||
-        char === '\f' ||
-        char === '\v' ||
-        char === '\u00A0' ||
-        char === '\uFEFF'
-    );
+export function isWhitespace(char?: string): boolean {
+    return Boolean(char?.match(/\s/));
 }
 
-export function isDigit(char?: string) {
-    if (char === undefined) {
-        return false;
-    }
-    return char >= '0' && char <= '9';
+export function isDigit(char?: string): boolean {
+    return Boolean(char?.match(/^\d$/));
 }
 
 /**
@@ -50,39 +34,44 @@ export function isDigit(char?: string) {
  * work in a non-destructive way with strings.
  */
 export class StringView {
-    _source: { data: string };
-    start = 0;
-    size: number;
+    #source: string;
+    #start = 0;
+    #size: number;
 
     constructor(data: string) {
-        this._source = { data };
-        this.size = data.length;
+        this.#source = data;
+        this.#size = data.length;
     }
 
     static fromStringView(sv: StringView) {
         const copy = new StringView('');
-        copy._source = sv._source;
-        copy.start = sv.start;
-        copy.size = sv.size;
+        copy.#source = sv.#source;
+        copy.#start = sv.#start;
+        copy.#size = sv.#size;
 
         return copy;
     }
 
-    static fromParts(source: { data: string }, start: number, size: number) {
+    static fromParts(source: string, start: number, size: number) {
         const copy = new StringView('');
-        copy._source = source;
-        copy.start = start;
-        copy.size = size;
+        copy.#source = source;
+        copy.#start = start;
+        copy.#size = size;
 
         return copy;
     }
 
     private get data() {
-        return this._source.data.substring(this.start, this.start + this.size);
+        return this.#source.substring(this.#start, this.#start + this.#size);
     }
 
     public charAt(index: number): string {
-        return this.data.charAt(index);
+        const str = this.data;
+        if (index < 0 || index >= str.length) return '';
+
+        const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+        const segments = [...segmenter.segment(str)];
+        return segments[index]?.segment ?? '';
     }
 
     public indexOf(search: string): number {
@@ -109,22 +98,31 @@ export class StringView {
         return this.data;
     }
 
-    public trimLeft() {
-        let i = 0;
-        while (i < this.data.length && isWhitespace(this.charAt(i))) {
-            i++;
-        }
-
-        return StringView.fromParts(this._source, this.start + i, this.size - i);
+    public trimLeft(): StringView {
+        const trimCount = [...this.data].findIndex((char) => !isWhitespace(char));
+        return trimCount === -1
+            ? StringView.fromParts(this.#source, this.#start + this.#size, 0)
+            : StringView.fromParts(this.#source, this.#start + trimCount, this.#size - trimCount);
     }
 
     public trimRight() {
-        let i = 0;
-        while (i < this.data.length && isWhitespace(this.charAt(this.data.length - i - 1))) {
-            i++;
+        const str = this.data;
+        const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+        const segments = [...segmenter.segment(str)];
+
+        let i = segments.length - 1;
+        while (i >= 0) {
+            const segment = segments[i];
+            if (!segment || !isWhitespace(segment.segment)) {
+                break;
+            }
+            i--;
         }
 
-        return StringView.fromParts(this._source, this.start, this.size - i);
+        // Calculate the new size based on the last non-whitespace character
+        const lastSegment = segments[i];
+        const newSize = lastSegment ? lastSegment.index + lastSegment.segment.length : 0;
+        return StringView.fromParts(this.#source, this.#start, newSize);
     }
 
     public trim() {
@@ -137,31 +135,65 @@ export class StringView {
             i++;
         }
 
-        return StringView.fromParts(this._source, this.start, i);
+        return StringView.fromParts(this.#source, this.#start, i);
     }
 
-    public chopLeft(size: number) {
-        let _size = size;
-        if (_size > this.data.length) {
-            _size = this.data.length;
+    public chopLeft(size: number): StringView {
+        const str = this.data;
+        const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+        const segments = [...segmenter.segment(str)];
+
+        // Handle negative and overflow cases
+        if (size <= 0) {
+            return StringView.fromParts(this.#source, this.#start, 0);
+        }
+        
+        // If size exceeds available segments, take everything
+        if (size >= segments.length) {
+            const result = StringView.fromStringView(this);
+            this.#start += this.#size;
+            this.#size = 0;
+            return result;
         }
 
-        const result = StringView.fromParts(this._source, this.start, _size);
-        this.start += _size;
-        this.size -= _size;
+        // Calculate byte offset for the requested number of graphemes
+        const actualSize = Math.min(size, segments.length);
+        const byteOffset = (segments[actualSize - 1]?.index ?? 0) + 
+                          (segments[actualSize - 1]?.segment.length ?? 0);
 
+        const result = StringView.fromParts(this.#source, this.#start, byteOffset);
+        this.#start += byteOffset;
+        this.#size -= byteOffset;
         return result;
     }
 
-    public chopRight(size: number) {
-        let _size = size;
-        if (_size > this.data.length) {
-            _size = this.data.length;
+    public chopRight(size: number): StringView {
+        const str = this.data;
+        const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+        const segments = [...segmenter.segment(str)];
+
+        // Handle negative and overflow cases
+        if (size <= 0) {
+            return StringView.fromParts(this.#source, this.#start, 0);
+        }
+        
+        // If size exceeds available segments, take everything
+        if (size >= segments.length) {
+            const result = StringView.fromStringView(this);
+            this.#start += this.#size;
+            this.#size = 0;
+            return result;
         }
 
-        const result = StringView.fromParts(this._source, this.start + this.size - _size, _size);
-        this.size -= _size;
+        // Calculate byte offset for the requested number of graphemes from the end
+        const startSegment = segments[segments.length - size];
+        if (!startSegment) {
+            return StringView.fromParts(this.#source, this.#start, 0);
+        }
 
+        const byteOffset = startSegment.index;
+        const result = StringView.fromParts(this.#source, this.#start + byteOffset, this.#size - byteOffset);
+        this.#size = byteOffset;
         return result;
     }
 
@@ -171,94 +203,144 @@ export class StringView {
             i++;
         }
 
-        const data = StringView.fromParts(this._source, this.start, i);
+        const data = StringView.fromParts(this.#source, this.#start, i);
 
-        if (i < this.size) {
-            this.start += i + 1;
-            this.size -= i + 1;
+        if (i < this.#size) {
+            this.#start += i + 1;
+            this.#size -= i + 1;
             return { data, success: true };
         }
 
         return { success: false };
     }
 
-    public chopByDelimiter(delim: string) {
+    public chopByDelimiter(delim: string): StringView {
+        const str = this.data;
+        const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+        const segments = [...segmenter.segment(str)];
+        
+        // Get delimiter graphemes
+        const delimSegments = [...segmenter.segment(delim)];
+        const delimLength = delimSegments.length;
+
+        // Find where the delimiter starts
         let i = 0;
-        while (i < this.data.length && this.data.charAt(i) !== delim) {
+        while (i < segments.length) {
+            // Check if current position could be the start of the delimiter
+            const remainingSegments = segments.slice(i);
+            const potentialDelim = remainingSegments
+                .slice(0, delimLength)  // Take enough segments for the delimiter
+                .map(s => s.segment)
+                .join('');
+            
+            if (potentialDelim === delim) {
+                // Found the delimiter
+                const upToDelim = segments.slice(0, i);
+                if (upToDelim.length === 0) {
+                    // Delimiter is at start
+                    const result = StringView.fromParts(this.#source, this.#start, 0);
+                    const afterDelim = segments[i + delimLength];
+                    if (!afterDelim) {
+                        this.#start = this.#start + this.#size;
+                        this.#size = 0;
+                        return result;
+                    }
+                    this.#start += afterDelim.index;
+                    this.#size -= afterDelim.index;
+                    return result;
+                }
+                // Create result up to delimiter
+                const segment = segments[i];
+                if (!segment) {
+                    throw new Error('Invalid segment index when creating StringView');
+                }
+                const result = StringView.fromParts(this.#source, this.#start, segment.index);
+
+                // Move past delimiter
+                const afterDelim = segments[i + delimLength];
+                if (!afterDelim) {
+                    this.#start += this.#size;
+                    this.#size = 0;
+                } else {
+                    this.#start += afterDelim.index;
+                    this.#size -= afterDelim.index;
+                }
+
+                return result;
+            }
             i++;
         }
 
-        const result = StringView.fromParts(this._source, this.start, i);
-
-        if (i < this.size) {
-            this.start += i + 1;
-            this.size -= i + 1;
-        } else {
-            this.start += i;
-            this.size -= i;
-        }
-
+        // Delimiter not found, return entire string
+        const result = StringView.fromParts(this.#source, this.#start, this.#size);
+        this.#start += this.#size;
+        this.#size = 0;
         return result;
     }
 
     public chopByStringView(delim: StringView) {
-        const window = StringView.fromParts(this._source, this.start, delim.size);
+        const window = StringView.fromParts(this.#source, this.#start, delim.#size);
         let i = 0;
-        while (i + delim.size < this.size && !window.eq(delim)) {
+        while (i + delim.#size < this.#size && !window.eq(delim)) {
             i++;
-            window.start++;
+            window.#start++;
         }
 
-        const result = StringView.fromParts(this._source, this.start, i);
+        const result = StringView.fromParts(this.#source, this.#start, i);
 
-        if (i + delim.size === this.size) {
-            result.size += delim.size;
+        if (i + delim.#size === this.#size) {
+            result.#size += delim.#size;
         }
 
-        this.start += i + delim.size;
-        this.size -= i + delim.size;
+        this.#start += i + delim.#size;
+        this.#size -= i + delim.#size;
 
         return result;
     }
 
-    public toInt() {
-        let result = 0;
-        let sign = 1;
-        let offset = 0;
-        if (this.data.charAt(0) === '-') {
-            sign = -1;
-            offset = 1;
-        } else if (this.data.charAt(0) === '+') offset = 1;
+    public toInt(): number {
+        const firstChar = this.data.charAt(0);
+        const sign = firstChar === '-' ? -1 : 1;
+        const offset = ['-', '+'].includes(firstChar) ? 1 : 0;
 
-        for (let i = 0 + offset; i < this.data.length && isDigit(this.data.charAt(i)); i++) {
-            result = result * 10 + Number.parseInt(this.data.charAt(i));
-        }
-
-        return result * sign;
+        const digits = this.data.slice(offset).match(/^\d+/)?.[0] ?? '';
+        return sign * [...digits].reduce((acc, digit) => acc * 10 + (Number.parseInt(digit) ?? 0), 0);
     }
 
-    public toFloat() {
+    public toFloat(): number {
         let result = 0.0;
-        let decimal = 0.0;
         let sign = 1;
         let offset = 0;
+
+        // Handle sign
         if (this.data.charAt(0) === '-') {
             sign = -1;
             offset = 1;
-        } else if (this.data.charAt(0) === '+') offset = 1;
+        } else if (this.data.charAt(0) === '+') {
+            offset = 1;
+        }
 
-        for (let i = 0 + offset; i < this.data.length; i++) {
-            if (this.data.charAt(i) === '.') {
-                decimal = 1.0;
-            } else if (!isDigit(this.data.charAt(i))) {
-                return result * sign;
+        let foundDecimal = false;
+        let decimalPlace = 0.1; // Start at first decimal place
+
+        for (let i = offset; i < this.data.length; i++) {
+            const char = this.data.charAt(i);
+
+            if (char === '.' && !foundDecimal) {
+                foundDecimal = true;
+                continue;
+            }
+
+            if (!isDigit(char)) {
+                break; // Stop at first non-digit
+            }
+
+            const digit = Number.parseInt(char);
+            if (foundDecimal) {
+                result += digit * decimalPlace;
+                decimalPlace *= 0.1;
             } else {
-                if (decimal > 0.0) {
-                    decimal *= 0.1;
-                    result += decimal * Number.parseInt(this.data.charAt(i));
-                } else {
-                    result = result * 10 + Number.parseInt(this.data.charAt(i));
-                }
+                result = result * 10 + digit;
             }
         }
 
@@ -269,18 +351,18 @@ export class StringView {
         let sign = 1;
         if (this.data.charAt(0) === '-') {
             sign = -1;
-            this.start++;
-            this.size--;
+            this.#start++;
+            this.#size--;
         } else if (this.data.charAt(0) === '+') {
-            this.start++;
-            this.size--;
+            this.#start++;
+            this.#size--;
         }
 
         let result = 0;
-        while (this.size > 0 && isDigit(this.charAt(0))) {
+        while (this.#size > 0 && isDigit(this.charAt(0))) {
             result = result * 10 + Number.parseInt(this.charAt(0));
-            this.start++;
-            this.size--;
+            this.#start++;
+            this.#size--;
         }
 
         return result * sign;
@@ -290,17 +372,17 @@ export class StringView {
         let sign = 1;
         if (this.data.charAt(0) === '-') {
             sign = -1;
-            this.start++;
-            this.size--;
+            this.#start++;
+            this.#size--;
         } else if (this.data.charAt(0) === '+') {
-            this.start++;
-            this.size--;
+            this.#start++;
+            this.#size--;
         }
 
         let result = 0.0;
         let decimal = 0.0;
 
-        while (this.size > 0) {
+        while (this.#size > 0) {
             if (this.charAt(0) === '.') {
                 decimal = 1.0;
             } else if (!isDigit(this.charAt(0))) {
@@ -314,8 +396,8 @@ export class StringView {
                 }
             }
 
-            this.start++;
-            this.size--;
+            this.#start++;
+            this.#size--;
         }
 
         return result * sign;
@@ -327,10 +409,29 @@ export class StringView {
             i++;
         }
 
-        const result = StringView.fromParts(this._source, this.start, i);
-        this.start += i;
-        this.size -= i;
+        const result = StringView.fromParts(this.#source, this.#start, i);
+        this.#start += i;
+        this.#size -= i;
 
         return result;
+    }
+
+    get source() {
+        return this.#source;
+    }
+
+    get start() {
+        return this.#start;
+    }
+
+    get size() {
+        return this.#size;
+    }
+
+    public *[Symbol.iterator](): Iterator<string> {
+        const chars = Array.from(this.data);
+        for (const char of chars) {
+            yield char;
+        }
     }
 }
