@@ -1,4 +1,4 @@
-import * as math from '@lib/utils/math';
+import * as math from '@lib/math';
 
 const BYTE_SCALE = 255;
 const BYTE_MASK = 0xff;

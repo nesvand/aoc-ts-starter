@@ -1,5 +1,5 @@
-import { type TestCase, runBenchmark, parseArgs } from "./bench";
-import { StringView } from "./string-view";
+import { type TestCase, runBenchmark, parseArgs } from "@lib/bench";
+import { StringView } from "@lib/string-view";
 
 // Test data with various content types and sizes
 const testData = {

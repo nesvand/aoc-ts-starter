@@ -1,5 +1,5 @@
-import { type TestCase, runBenchmark, parseArgs } from "./bench";
-import * as bits from "./bits";
+import { type TestCase, runBenchmark, parseArgs } from "@lib/bench";
+import * as bits from "@lib/bits";
 
 // Test data with various sizes and patterns
 const testData = {

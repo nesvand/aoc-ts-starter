@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { StringView, isDigit, isWhitespace } from '@lib/utils/string-view';
+import { StringView, isDigit, isWhitespace } from '@lib/string-view';
 
 describe('@lib/utils/string-view', () => {
     describe('StringView', () => {

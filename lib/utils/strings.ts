@@ -1,4 +1,4 @@
-import { StringView, isWhitespace } from '@lib/utils/string-view';
+import { StringView, isWhitespace } from '@lib/string-view';
 
 export function int() {
     return (sv: StringView) => {

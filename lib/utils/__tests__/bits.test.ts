@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { type Bit, bitStringToNumber, bitSubstring, bitsToNumber, hexToPaddedBinary } from '@lib/utils/bits';
+import { type Bit, bitStringToNumber, bitSubstring, bitsToNumber, hexToPaddedBinary } from '@lib/bits';
 
 describe('@lib/utils/bits', () => {
     describe('hexToPaddedBinary', () => {

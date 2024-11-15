@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { clamp, isNumber, lerp, lerpAngle, mapRange, mod } from '@lib/utils/math';
+import { clamp, isNumber, lerp, lerpAngle, mapRange, mod } from '@lib/math';
 
 describe('@lib/utils/math', () => {
     describe('isNumber', () => {

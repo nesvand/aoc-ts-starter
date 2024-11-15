@@ -8,7 +8,7 @@ import {
     hexStringToColor,
     hexToColor,
     lerpColor,
-} from '@lib/utils/color';
+} from '@lib/color';
 
 describe('@lib/utils/color', () => {
     describe('lerpColor', () => {

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from 'bun:test';
-import { RingBuffer } from '@lib/utils/data';
+import { RingBuffer } from '@lib/data';
 describe('@lib/utils/data', () => {
     describe('RingBuffer', () => {
         let buffer: RingBuffer<number>;

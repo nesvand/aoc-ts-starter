@@ -1,5 +1,5 @@
-import * as arrayUtils from "./array";
-import { type TestCase, runBenchmark, parseArgs } from "./bench";
+import * as arrayUtils from "@lib/array";
+import { type TestCase, runBenchmark, parseArgs } from "@lib/bench";
 
 // Pre-generate a fixed set of numbers
 const ARRAY_SIZE = 100000;

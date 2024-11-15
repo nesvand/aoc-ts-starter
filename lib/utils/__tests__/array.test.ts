@@ -15,7 +15,7 @@ import {
     splitOn,
     sum,
     zip,
-} from '@lib/utils/array';
+} from '@lib/array';
 
 describe('@lib/utils/array', () => {
     describe('sort', () => {

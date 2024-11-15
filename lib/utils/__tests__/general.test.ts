@@ -1,5 +1,5 @@
 import { describe, expect, jest, test } from 'bun:test';
-import { asyncTimes, invert, isDefined, mapGetOrCreate, times, wait } from '@lib/utils/general';
+import { asyncTimes, invert, isDefined, mapGetOrCreate, times, wait } from '@lib/general';
 
 describe('@lib/utils/general', () => {
     describe('isDefined', () => {
