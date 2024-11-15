@@ -20,28 +20,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-export function isWhitespace(char?: string) {
-    if (char === undefined) {
-        return false;
-    }
-
-    return (
-        char === ' ' ||
-        char === '\n' ||
-        char === '\t' ||
-        char === '\r' ||
-        char === '\f' ||
-        char === '\v' ||
-        char === '\u00A0' ||
-        char === '\uFEFF'
-    );
+export function isWhitespace(char?: string): boolean {
+    return Boolean(char?.match(/\s/));
 }
 
-export function isDigit(char?: string) {
-    if (char === undefined) {
-        return false;
-    }
-    return char >= '0' && char <= '9';
+export function isDigit(char?: string): boolean {
+    return Boolean(char?.match(/^\d$/));
 }
 
 /**
@@ -82,7 +66,7 @@ export class StringView {
     }
 
     public charAt(index: number): string {
-        return this.data.charAt(index);
+        return this.data[index] ?? '';
     }
 
     public indexOf(search: string): number {
@@ -109,13 +93,11 @@ export class StringView {
         return this.data;
     }
 
-    public trimLeft() {
-        let i = 0;
-        while (i < this.data.length && isWhitespace(this.charAt(i))) {
-            i++;
-        }
-
-        return StringView.fromParts(this.#source, this.#start + i, this.#size - i);
+    public trimLeft(): StringView {
+        const trimCount = [...this.data].findIndex(char => !isWhitespace(char));
+        return trimCount === -1 
+            ? StringView.fromParts(this.#source, this.#start + this.#size, 0)
+            : StringView.fromParts(this.#source, this.#start + trimCount, this.#size - trimCount);
     }
 
     public trimRight() {
@@ -140,16 +122,11 @@ export class StringView {
         return StringView.fromParts(this.#source, this.#start, i);
     }
 
-    public chopLeft(size: number) {
-        let _size = size;
-        if (_size > this.data.length) {
-            _size = this.data.length;
-        }
-
-        const result = StringView.fromParts(this.#source, this.#start, _size);
-        this.#start += _size;
-        this.#size -= _size;
-
+    public chopLeft(size: number): StringView {
+        const actualSize = Math.min(size, this.data.length);
+        const result = StringView.fromParts(this.#source, this.#start, actualSize);
+        this.#start += actualSize;
+        this.#size -= actualSize;
         return result;
     }
 
@@ -221,20 +198,13 @@ export class StringView {
         return result;
     }
 
-    public toInt() {
-        let result = 0;
-        let sign = 1;
-        let offset = 0;
-        if (this.data.charAt(0) === '-') {
-            sign = -1;
-            offset = 1;
-        } else if (this.data.charAt(0) === '+') offset = 1;
-
-        for (let i = 0 + offset; i < this.data.length && isDigit(this.data.charAt(i)); i++) {
-            result = result * 10 + Number.parseInt(this.data.charAt(i));
-        }
-
-        return result * sign;
+    public toInt(): number {
+        const firstChar = this.data.charAt(0);
+        const sign = firstChar === '-' ? -1 : 1;
+        const offset = ['-', '+'].includes(firstChar) ? 1 : 0;
+        
+        const digits = this.data.slice(offset).match(/^\d+/)?.[0] ?? '';
+        return sign * [...digits].reduce((acc, digit) => acc * 10 + (Number.parseInt(digit) ?? 0), 0);
     }
 
     public toFloat() {
@@ -344,5 +314,11 @@ export class StringView {
 
     get size() {
         return this.#size;
+    }
+
+    public *[Symbol.iterator](): Iterator<string> {
+        for (let i = 0; i < this.size; i++) {
+            yield this.charAt(i);
+        }
     }
 }

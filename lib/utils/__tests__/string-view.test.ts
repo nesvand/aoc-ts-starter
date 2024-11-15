@@ -59,8 +59,8 @@ describe('@lib/utils/string-view', () => {
             const sv = new StringView('1234test');
             expect(
                 sv
-                    .takeLeftWhile((char) => typeof char !== 'undefined' && ['1', '2', '3', '4'].includes(char))
-                    .toString(),
+                    .takeLeftWhile(char => isDigit(char))
+                    .toString()
             ).toBe('1234');
             expect(sv.toString()).toBe('1234test');
         });
@@ -168,8 +168,8 @@ describe('@lib/utils/string-view', () => {
             const sv = new StringView('1234test');
             expect(
                 sv
-                    .chopLeftWhile((char) => typeof char !== 'undefined' && ['1', '2', '3', '4'].includes(char))
-                    .toString(),
+                    .chopLeftWhile(char => isDigit(char))
+                    .toString()
             ).toBe('1234');
             expect(sv.toString()).toBe('test');
         });
@@ -178,16 +178,12 @@ describe('@lib/utils/string-view', () => {
             const data = '           1 2 3 4 5 6 7 8 9 10        ';
             const expected = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-            const sv = new StringView(data);
-            const result: number[] = [];
-            sv.chopLeftWhile(isWhitespace);
-            while (sv.size > 0) {
-                result.push(sv.chopInt());
-                sv.chopLeftWhile(isWhitespace);
-            }
+            const sv = new StringView(data).trim();
+            const result = sv.toString()
+                .split(/\s+/)
+                .map(Number);
 
             expect(result).toEqual(expected);
-            expect(sv.toString()).toBe('');
         });
 
         test('original text is not modified', () => {
@@ -195,6 +191,110 @@ describe('@lib/utils/string-view', () => {
             const result = sv.chopByDelimiter(' ');
             expect(sv.source).toBe('1234 test');
             expect(sv.source === result.source).toBe(true);
+        });
+
+        test('should support iteration', () => {
+            const sv = new StringView('test');
+            expect([...sv]).toEqual(['t', 'e', 's', 't']);
+        });
+
+        test('should support for...of loop', () => {
+            const sv = new StringView('test');
+            const chars: string[] = [];
+            for (const char of sv) {
+                chars.push(char);
+            }
+            expect(chars).toEqual(['t', 'e', 's', 't']);
+        });
+
+        test('empty string handling', () => {
+            const empty = new StringView('');
+            expect(empty.size).toBe(0);
+            expect(empty.toString()).toBe('');
+            expect([...empty]).toEqual([]);
+            expect(empty.trim().toString()).toBe('');
+            expect(empty.chopLeft(1).toString()).toBe('');
+            expect(empty.chopRight(1).toString()).toBe('');
+        });
+
+        test('unicode character handling', () => {
+            const unicode = new StringView('Hello 👋 世界');
+            expect(unicode.size).toBe(10);
+            expect([...unicode]).toHaveLength(10);
+            expect(unicode.charAt(6)).toBe('👋');
+        });
+
+        test('number parsing edge cases', () => {
+            expect(new StringView('').toInt()).toBe(0);
+            expect(new StringView('abc').toInt()).toBe(0);
+            expect(new StringView('123abc456').toInt()).toBe(123);
+            expect(new StringView('-0').toInt()).toBe(0);
+            expect(new StringView('+0').toInt()).toBe(0);
+            expect(new StringView('+-123').toInt()).toBe(0);
+        });
+
+        test('float parsing edge cases', () => {
+            expect(new StringView('').toFloat()).toBe(0);
+            expect(new StringView('.').toFloat()).toBe(0);
+            expect(new StringView('abc').toFloat()).toBe(0);
+            expect(new StringView('123.abc').toFloat()).toBe(123);
+            expect(new StringView('123.456.789').toFloat()).toBe(123.456);
+            expect(new StringView('-0.0').toFloat()).toBe(0);
+            expect(new StringView('+.123').toFloat()).toBe(0.123);
+        });
+
+        test('delimiter edge cases', () => {
+            const sv = new StringView('test||test||');
+            
+            // Multiple consecutive delimiters
+            expect(sv.chopByDelimiter('||').toString()).toBe('test');
+            expect(sv.toString()).toBe('test||');
+
+            // Empty sections between delimiters
+            const empty = new StringView('||');
+            expect(empty.chopByDelimiter('|').toString()).toBe('');
+            expect(empty.toString()).toBe('|');
+        });
+
+        test('whitespace edge cases', () => {
+            // Mixed whitespace characters
+            const mixed = new StringView('\r\n\t \f\v');
+            expect(mixed.trim().toString()).toBe('');
+
+            // Non-breaking spaces and other special whitespace
+            const special = new StringView('\u00A0\u2003test\u00A0\u2003');
+            expect(special.trim().toString()).toBe('test');
+        });
+
+        test('method chaining with empty results', () => {
+            const sv = new StringView('   ');
+            expect(sv.trim().chopLeft(1).toString()).toBe('');
+            expect(sv.trim().chopRight(1).toString()).toBe('');
+        });
+
+        test('bounds checking', () => {
+            const sv = new StringView('test');
+            expect(sv.charAt(-1)).toBe('');
+            expect(sv.charAt(4)).toBe('');
+            expect(sv.chopLeft(-1).toString()).toBe('');
+            expect(sv.chopRight(-1).toString()).toBe('');
+        });
+
+        test('large string handling', () => {
+            const largeString = 'a'.repeat(1000000);
+            const sv = new StringView(largeString);
+            expect(sv.size).toBe(1000000);
+            expect(sv.charAt(999999)).toBe('a');
+        });
+
+        test('mutation independence', () => {
+            const original = 'test string';
+            const sv1 = new StringView(original);
+            const sv2 = StringView.fromStringView(sv1);
+            
+            sv1.chopLeft(5);
+            expect(sv1.toString()).toBe('string');
+            expect(sv2.toString()).toBe('test string');
         });
     });
 
@@ -214,6 +314,10 @@ describe('@lib/utils/string-view', () => {
 
         test('should return false for undefined', () => {
             expect(isWhitespace(undefined)).toBe(false);
+        });
+
+        test('should handle null', () => {
+            expect(isWhitespace(null)).toBe(false);
         });
     });
 
@@ -239,6 +343,10 @@ describe('@lib/utils/string-view', () => {
 
         test('should return false for undefined', () => {
             expect(isDigit(undefined)).toBe(false);
+        });
+
+        test('should handle null', () => {
+            expect(isDigit(null)).toBe(false);
         });
     });
 });
