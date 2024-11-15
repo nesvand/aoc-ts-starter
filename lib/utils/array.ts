@@ -57,9 +57,64 @@ export const chunk = <T>(arr: T[], size: number): T[][] => {
     }, []);
 };
 
-export const rollingWindow = <T>(arr: T[], size: number): T[][] => {
-    if (size <= 0 || arr.length < size) return [];
+/**
+ * An iterator that efficiently generates sliding windows over an array.
+ * Each window is created only when requested, making it memory efficient
+ * for large arrays or when early termination is possible.
+ */
+export class RollingWindowIterator<T> implements IterableIterator<T[]> {
+    private currentIndex = 0;
+    private readonly array: T[];
+    private readonly windowSize: number;
 
-    const windowCount = arr.length - size + 1;
-    return Array.from({ length: windowCount }, (_, i) => arr.slice(i, i + size));
+    constructor(array: T[], windowSize: number) {
+        this.array = array;
+        this.windowSize = windowSize;
+    }
+
+    [Symbol.iterator](): IterableIterator<T[]> {
+        return this;
+    }
+
+    next(): IteratorResult<T[]> {
+        if (this.currentIndex > this.array.length - this.windowSize) {
+            return { done: true, value: undefined };
+        }
+
+        const window = this.array.slice(this.currentIndex, this.currentIndex + this.windowSize);
+        this.currentIndex++;
+        return { done: false, value: window };
+    }
+}
+
+/**
+ * Creates an iterator that yields sliding windows over an array.
+ *
+ * @example
+ * // Process windows until a condition is met
+ * for (const window of rollingWindow(array, 3)) {
+ *     if (someCondition(window)) {
+ *         break;  // Stop processing early
+ *     }
+ * }
+ *
+ * @example
+ * // Convert to array if all windows are needed
+ * const allWindows = [...rollingWindow(array, 3)];
+ *
+ * @param arr - The input array to create windows from
+ * @param size - The size of each window
+ * @returns An iterator yielding arrays of size `size` containing consecutive elements
+ *
+ * Key benefits:
+ * - Memory efficient: Only creates one window at a time
+ * - Lazy evaluation: Windows are created only when requested
+ * - Early termination: Can break from processing without creating unnecessary windows
+ * - Flexible usage: Works with for...of loops and can be spread into an array
+ */
+export const rollingWindow = <T>(arr: T[], size: number): IterableIterator<T[]> => {
+    if (size <= 0 || arr.length < size) {
+        return [][Symbol.iterator]();
+    }
+    return new RollingWindowIterator(arr, size);
 };

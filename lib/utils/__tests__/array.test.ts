@@ -119,11 +119,29 @@ describe('@lib/utils/array', () => {
 
     describe('rollingWindow', () => {
         it('should create a rolling window', () => {
-            expect(rollingWindow([1, 2, 3, 4, 5], 2)).toEqual([
+            const result = [...rollingWindow([1, 2, 3, 4, 5], 2)];
+            expect(result).toEqual([
                 [1, 2],
                 [2, 3],
                 [3, 4],
                 [4, 5],
+            ]);
+        });
+
+        it('should return empty iterator for invalid size', () => {
+            expect([...rollingWindow([1, 2, 3], 0)]).toEqual([]);
+            expect([...rollingWindow([1, 2, 3], 4)]).toEqual([]);
+        });
+
+        it('should work with for...of loop', () => {
+            const result: number[][] = [];
+            for (const window of rollingWindow([1, 2, 3, 4], 2)) {
+                result.push(window);
+            }
+            expect(result).toEqual([
+                [1, 2],
+                [2, 3],
+                [3, 4],
             ]);
         });
     });
