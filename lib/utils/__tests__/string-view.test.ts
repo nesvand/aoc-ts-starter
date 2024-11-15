@@ -193,8 +193,8 @@ describe('@lib/utils/string-view', () => {
         test('original text is not modified', () => {
             const sv = new StringView('1234 test');
             const result = sv.chopByDelimiter(' ');
-            expect(sv._source.data).toBe('1234 test');
-            expect(sv._source === result._source).toBe(true);
+            expect(sv.source).toBe('1234 test');
+            expect(sv.source === result.source).toBe(true);
         });
     });
 

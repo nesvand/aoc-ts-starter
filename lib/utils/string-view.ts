@@ -50,12 +50,12 @@ export function isDigit(char?: string) {
  * work in a non-destructive way with strings.
  */
 export class StringView {
-    _source: { data: string };
+    private _source: string;
     start = 0;
     size: number;
 
     constructor(data: string) {
-        this._source = { data };
+        this._source = data;
         this.size = data.length;
     }
 
@@ -68,7 +68,7 @@ export class StringView {
         return copy;
     }
 
-    static fromParts(source: { data: string }, start: number, size: number) {
+    static fromParts(source: string, start: number, size: number) {
         const copy = new StringView('');
         copy._source = source;
         copy.start = start;
@@ -78,7 +78,7 @@ export class StringView {
     }
 
     private get data() {
-        return this._source.data.substring(this.start, this.start + this.size);
+        return this._source.substring(this.start, this.start + this.size);
     }
 
     public charAt(index: number): string {
@@ -332,5 +332,9 @@ export class StringView {
         this.size -= i;
 
         return result;
+    }
+
+    get source() {
+        return this._source;
     }
 }
