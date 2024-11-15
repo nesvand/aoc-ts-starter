@@ -57,9 +57,197 @@ export const chunk = <T>(arr: T[], size: number): T[][] => {
     }, []);
 };
 
-export const rollingWindow = <T>(arr: T[], size: number): T[][] => {
-    if (size <= 0 || arr.length < size) return [];
+/**
+ * Creates a proxy that tracks array mutations
+ */
+function createArrayProxy<T>(array: T[], onChange: () => void): T[] {
+    return new Proxy(array, {
+        set(target, property, value) {
+            const result = Reflect.set(target, property, value);
+            onChange();
+            return result;
+        },
+        deleteProperty(target, property) {
+            const result = Reflect.deleteProperty(target, property);
+            onChange();
+            return result;
+        },
+    });
+}
 
-    const windowCount = arr.length - size + 1;
-    return Array.from({ length: windowCount }, (_, i) => arr.slice(i, i + size));
+/**
+ * An iterator that efficiently generates sliding windows over an array.
+ * Supports caching, change detection, and iterator reuse.
+ *
+ * @example
+ * // Basic iterator usage
+ * const iterator = new RollingWindowIterator([1, 2, 3, 4], 2);
+ * for (const window of iterator) {
+ *   console.log(window); // [1, 2], [2, 3], [3, 4]
+ * }
+ *
+ * // With caching
+ * iterator.cacheAll();
+ * const windows = [...iterator]; // Uses cached windows
+ *
+ * // Change detection
+ * const watchedArray = iterator.getArray();
+ * watchedArray[0] = 10; // Automatically invalidates cache
+ *
+ * // Reusing the iterator
+ * iterator.reset([5, 6, 7], 2); // New array and/or window size
+ * const newWindows = [...iterator];
+ */
+export class RollingWindowIterator<T> implements IterableIterator<T[]> {
+    private currentIndex = 0;
+    private array: T[];
+    private windowSize: number;
+    private cache: T[][] | null = null;
+    private isDirty = false;
+    private proxyArray: T[];
+
+    constructor(array: T[], windowSize: number) {
+        this.proxyArray = createArrayProxy(array, () => {
+            this.isDirty = true;
+        });
+        this.array = array;
+        this.windowSize = windowSize;
+    }
+
+    /**
+     * Resets the iterator with a new array and/or window size.
+     * Clears the cache and resets the iteration state.
+     */
+    public reset(array?: T[], windowSize?: number): this {
+        if (array) {
+            this.proxyArray = createArrayProxy(array, () => {
+                this.isDirty = true;
+            });
+            this.array = array;
+        }
+        if (windowSize !== undefined) {
+            this.windowSize = windowSize;
+        }
+        this.clearCache();
+        this.currentIndex = 0;
+        return this;
+    }
+
+    [Symbol.iterator](): IterableIterator<T[]> {
+        this.currentIndex = 0;
+        return this;
+    }
+
+    private generateAllWindows(): T[][] {
+        const windows: T[][] = [];
+        let index = 0;
+
+        while (index <= this.array.length - this.windowSize) {
+            windows.push(this.array.slice(index, index + this.windowSize));
+            index++;
+        }
+
+        this.isDirty = false;
+        this.currentIndex = 0;
+        return windows;
+    }
+
+    /**
+     * Returns the proxied array that will trigger cache invalidation when modified
+     */
+    public getArray(): T[] {
+        return this.proxyArray;
+    }
+
+    /**
+     * Caches all windows for faster subsequent iterations.
+     * Returns the cached windows.
+     */
+    public cacheAll(): T[][] {
+        this.cache = this.generateAllWindows();
+        return this.cache;
+    }
+
+    /**
+     * Clears the cache, forcing windows to be regenerated on next iteration
+     */
+    public clearCache(): void {
+        this.cache = null;
+        this.isDirty = true;
+    }
+
+    next(): IteratorResult<T[]> {
+        // If we have a cache, use it
+        if (this.cache) {
+            // Check if array has changed
+            if (this.isDirty) {
+                this.cache = this.generateAllWindows();
+            }
+
+            if (this.currentIndex >= this.cache.length) {
+                return { done: true, value: undefined };
+            }
+
+            const value = this.cache[this.currentIndex];
+            if (!value) {
+                return { done: true, value: undefined };
+            }
+            this.currentIndex++;
+            return { done: false, value };
+        }
+
+        // No cache, generate windows on-the-fly
+        if (this.currentIndex > this.array.length - this.windowSize) {
+            return { done: true, value: undefined };
+        }
+
+        const window = this.array.slice(this.currentIndex, this.currentIndex + this.windowSize);
+        this.currentIndex++;
+        return { done: false, value: window };
+    }
+}
+
+// Update the singleton instance declaration to use unknown type
+const reusableIterator = new RollingWindowIterator<unknown>([], 0);
+
+/**
+ * Creates an iterator that yields sliding windows over an array.
+ * This function reuses a single iterator instance for better performance.
+ *
+ * For advanced features like caching and change detection, create a
+ * RollingWindowIterator instance directly.
+ *
+ * @example
+ * // Basic usage
+ * const windows = [...rollingWindow([1, 2, 3, 4], 2)];
+ * // [[1, 2], [2, 3], [3, 4]]
+ *
+ * // Using in a for...of loop
+ * for (const window of rollingWindow(array, 3)) {
+ *     // Process each window
+ * }
+ *
+ * // Advanced usage with direct iterator
+ * const iterator = new RollingWindowIterator(array, 3);
+ * const watchedArray = iterator.getArray();
+ * iterator.cacheAll();
+ *
+ * // Modify array through proxy to trigger cache invalidation
+ * watchedArray[0] = 42;
+ *
+ * @param arr - The input array to create windows from
+ * @param size - The size of each window
+ * @returns An iterator yielding arrays of size `size` containing consecutive elements
+ *
+ * Key features:
+ * - Memory efficient: Only creates windows when needed
+ * - Reusable: Uses a single iterator instance
+ * - Supports caching via RollingWindowIterator
+ * - Supports change detection via proxy array
+ */
+export const rollingWindow = <T>(arr: T[], size: number): IterableIterator<T[]> => {
+    if (size <= 0 || arr.length < size) {
+        return [][Symbol.iterator]();
+    }
+    return reusableIterator.reset(arr, size) as IterableIterator<T[]>;
 };

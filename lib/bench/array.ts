@@ -27,7 +27,14 @@ const testCases: TestCase[] = [
     },
     {
         name: ArrayBenchmarks.ROLLING_WINDOW,
-        fn: (arr: number[]) => arrayUtils.rollingWindow(arr, 50),
+        fn: (arr: number[]) => {
+            // Consume the iterator to ensure fair comparison
+            const windows: number[][] = [];
+            for (const window of arrayUtils.rollingWindow(arr, 50)) {
+                windows.push(window);
+            }
+            return windows;
+        },
         setup: () => testData.sequential,
     },
 ];
