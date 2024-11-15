@@ -15,6 +15,7 @@ import {
     splitOn,
     sum,
     zip,
+    RollingWindowIterator,
 } from '@lib/array';
 
 describe('@lib/utils/array', () => {
@@ -118,7 +119,7 @@ describe('@lib/utils/array', () => {
     });
 
     describe('rollingWindow', () => {
-        it('should create a rolling window', () => {
+        it('should create rolling windows of the specified size', () => {
             const result = [...rollingWindow([1, 2, 3, 4, 5], 2)];
             expect(result).toEqual([
                 [1, 2],
@@ -128,9 +129,16 @@ describe('@lib/utils/array', () => {
             ]);
         });
 
-        it('should return empty iterator for invalid size', () => {
+        it('should handle edge cases', () => {
+            // Invalid window sizes
             expect([...rollingWindow([1, 2, 3], 0)]).toEqual([]);
             expect([...rollingWindow([1, 2, 3], 4)]).toEqual([]);
+
+            // Single element window
+            expect([...rollingWindow([1, 2, 3], 1)]).toEqual([[1], [2], [3]]);
+
+            // Window size equals array length
+            expect([...rollingWindow([1, 2, 3], 3)]).toEqual([[1, 2, 3]]);
         });
 
         it('should work with for...of loop', () => {
@@ -143,6 +151,73 @@ describe('@lib/utils/array', () => {
                 [2, 3],
                 [3, 4],
             ]);
+        });
+
+        describe('caching behavior', () => {
+            it('should cache windows and use them for subsequent iterations', () => {
+                const array = [1, 2, 3, 4, 5];
+                const iterator = new RollingWindowIterator(array, 2);
+
+                const cached = iterator.cacheAll();
+                expect(cached).toEqual([
+                    [1, 2],
+                    [2, 3],
+                    [3, 4],
+                    [4, 5],
+                ]);
+
+                // Should use cache on subsequent iterations
+                const result = [...iterator];
+                expect(result).toEqual(cached);
+            });
+
+            it('should detect array modifications through proxy', () => {
+                const array = [1, 2, 3, 4];
+                const iterator = new RollingWindowIterator(array, 2);
+                const watchedArray = iterator.getArray();
+
+                iterator.cacheAll();
+
+                // Test value modification
+                watchedArray[0] = 10;
+                expect([...iterator]).toEqual([
+                    [10, 2],
+                    [2, 3],
+                    [3, 4],
+                ]);
+
+                // Test array mutations
+                watchedArray.push(5);
+                expect([...iterator]).toEqual([
+                    [10, 2],
+                    [2, 3],
+                    [3, 4],
+                    [4, 5],
+                ]);
+
+                watchedArray.pop();
+                expect([...iterator]).toEqual([
+                    [10, 2],
+                    [2, 3],
+                    [3, 4],
+                ]);
+            });
+
+            it('should allow manual cache control', () => {
+                const array = [1, 2, 3, 4];
+                const iterator = new RollingWindowIterator(array, 2);
+
+                iterator.cacheAll();
+                iterator.clearCache();
+
+                // Should still work without cache
+                const result = [...iterator];
+                expect(result).toEqual([
+                    [1, 2],
+                    [2, 3],
+                    [3, 4],
+                ]);
+            });
         });
     });
 });

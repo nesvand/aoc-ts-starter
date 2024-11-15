@@ -58,25 +58,104 @@ export const chunk = <T>(arr: T[], size: number): T[][] => {
 };
 
 /**
- * An iterator that efficiently generates sliding windows over an array.
- * Each window is created only when requested, making it memory efficient
- * for large arrays or when early termination is possible.
+ * Creates a proxy that tracks array mutations
  */
+function createArrayProxy<T>(array: T[], onChange: () => void): T[] {
+    return new Proxy(array, {
+        set(target, property, value) {
+            const result = Reflect.set(target, property, value);
+            onChange();
+            return result;
+        },
+        deleteProperty(target, property) {
+            const result = Reflect.deleteProperty(target, property);
+            onChange();
+            return result;
+        },
+    });
+}
+
 export class RollingWindowIterator<T> implements IterableIterator<T[]> {
     private currentIndex = 0;
     private readonly array: T[];
     private readonly windowSize: number;
+    private cache: T[][] | null = null;
+    private isDirty = false;
+    private readonly proxyArray: T[];
 
     constructor(array: T[], windowSize: number) {
+        this.proxyArray = createArrayProxy(array, () => {
+            this.isDirty = true;
+        });
+
         this.array = array;
         this.windowSize = windowSize;
     }
 
     [Symbol.iterator](): IterableIterator<T[]> {
+        this.currentIndex = 0;
         return this;
     }
 
+    private generateAllWindows(): T[][] {
+        const windows: T[][] = [];
+        let index = 0;
+
+        while (index <= this.array.length - this.windowSize) {
+            windows.push(this.array.slice(index, index + this.windowSize));
+            index++;
+        }
+
+        this.isDirty = false;
+        this.currentIndex = 0;
+        return windows;
+    }
+
+    /**
+     * Returns the proxied array that will trigger cache invalidation when modified
+     */
+    public getArray(): T[] {
+        return this.proxyArray;
+    }
+
+    /**
+     * Caches all windows for faster subsequent iterations.
+     * Returns the cached windows.
+     */
+    public cacheAll(): T[][] {
+        this.cache = this.generateAllWindows();
+        return this.cache;
+    }
+
+    /**
+     * Clears the cache, forcing windows to be regenerated on next iteration
+     */
+    public clearCache(): void {
+        this.cache = null;
+        this.isDirty = true;
+    }
+
     next(): IteratorResult<T[]> {
+        // If we have a cache, use it
+        if (this.cache) {
+            // Check if array has changed
+            if (this.isDirty) {
+                this.cache = this.generateAllWindows();
+            }
+
+            if (this.currentIndex >= this.cache.length) {
+                return { done: true, value: undefined };
+            }
+
+            const value = this.cache[this.currentIndex];
+            if (!value) {
+                return { done: true, value: undefined };
+            }
+            this.currentIndex++;
+            return { done: false, value };
+        }
+
+        // No cache, generate windows on-the-fly
         if (this.currentIndex > this.array.length - this.windowSize) {
             return { done: true, value: undefined };
         }
@@ -91,26 +170,17 @@ export class RollingWindowIterator<T> implements IterableIterator<T[]> {
  * Creates an iterator that yields sliding windows over an array.
  *
  * @example
- * // Process windows until a condition is met
- * for (const window of rollingWindow(array, 3)) {
- *     if (someCondition(window)) {
- *         break;  // Stop processing early
- *     }
- * }
+ * // Get a proxy-wrapped array that will trigger cache invalidation when modified
+ * const iterator = new RollingWindowIterator(array, 3);
+ * const watchedArray = iterator.getArray();
+ * iterator.cacheAll();
  *
- * @example
- * // Convert to array if all windows are needed
- * const allWindows = [...rollingWindow(array, 3)];
+ * // Modifying the watched array will automatically invalidate the cache
+ * watchedArray[0] = 42;
  *
  * @param arr - The input array to create windows from
  * @param size - The size of each window
  * @returns An iterator yielding arrays of size `size` containing consecutive elements
- *
- * Key benefits:
- * - Memory efficient: Only creates one window at a time
- * - Lazy evaluation: Windows are created only when requested
- * - Early termination: Can break from processing without creating unnecessary windows
- * - Flexible usage: Works with for...of loops and can be spread into an array
  */
 export const rollingWindow = <T>(arr: T[], size: number): IterableIterator<T[]> => {
     if (size <= 0 || arr.length < size) {
