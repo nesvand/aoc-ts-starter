@@ -1,5 +1,6 @@
 import { type TestCase, parseArgs, runBenchmark } from '@lib/bench';
 import * as bits from '@lib/bits';
+import { BitsBenchmarks } from './types';
 
 // Test data with various sizes and patterns
 const testData = {
@@ -20,70 +21,69 @@ const testData = {
 };
 
 const testCases: TestCase[] = [
-    // hexToPaddedBinary tests
     {
-        name: 'hexToPaddedBinary-small',
+        name: BitsBenchmarks.HEX_TO_PADDED_BINARY_SMALL,
         fn: bits.hexToPaddedBinary,
         setup: () => testData.smallHex,
     },
     {
-        name: 'hexToPaddedBinary-medium',
+        name: BitsBenchmarks.HEX_TO_PADDED_BINARY_MEDIUM,
         fn: bits.hexToPaddedBinary,
         setup: () => testData.mediumHex,
     },
     {
-        name: 'hexToPaddedBinary-large',
+        name: BitsBenchmarks.HEX_TO_PADDED_BINARY_LARGE,
         fn: bits.hexToPaddedBinary,
         setup: () => testData.largeHex,
     },
 
     // bitStringToNumber tests
     {
-        name: 'bitStringToNumber-16',
+        name: BitsBenchmarks.BIT_STRING_TO_NUMBER_16,
         fn: bits.bitStringToNumber,
         setup: () => testData.smallBinary,
     },
     {
-        name: 'bitStringToNumber-32',
+        name: BitsBenchmarks.BIT_STRING_TO_NUMBER_32,
         fn: bits.bitStringToNumber,
         setup: () => testData.mediumBinary.slice(0, 32),
     },
     {
-        name: 'bitStringToNumber-53', // Max safe integer bits
+        name: BitsBenchmarks.BIT_STRING_TO_NUMBER_53, // Max safe integer bits
         fn: bits.bitStringToNumber,
         setup: () => testData.mediumBinary.slice(0, 53),
     },
 
     // bitsToNumber tests
     {
-        name: 'bitsToNumber-16',
+        name: BitsBenchmarks.BITS_TO_NUMBER_16,
         fn: bits.bitsToNumber,
         setup: () => testData.bits.slice(0, 16),
     },
     {
-        name: 'bitsToNumber-32',
+        name: BitsBenchmarks.BITS_TO_NUMBER_32,
         fn: bits.bitsToNumber,
         setup: () => testData.bits.slice(0, 32),
     },
     {
-        name: 'bitsToNumber-53',
+        name: BitsBenchmarks.BITS_TO_NUMBER_53,
         fn: bits.bitsToNumber,
         setup: () => testData.bits.slice(0, 53),
     },
 
     // bitSubstring tests
     {
-        name: 'bitSubstring-small',
+        name: BitsBenchmarks.BIT_SUBSTRING_SMALL,
         fn: (str: string) => bits.bitSubstring(str, 0, 8),
         setup: () => testData.smallBinary,
     },
     {
-        name: 'bitSubstring-medium',
+        name: BitsBenchmarks.BIT_SUBSTRING_MEDIUM,
         fn: (str: string) => bits.bitSubstring(str, 16, 32),
         setup: () => testData.mediumBinary,
     },
     {
-        name: 'bitSubstring-large',
+        name: BitsBenchmarks.BIT_SUBSTRING_LARGE,
         fn: (str: string) => bits.bitSubstring(str, 64, 96),
         setup: () => testData.largeBinary,
     },

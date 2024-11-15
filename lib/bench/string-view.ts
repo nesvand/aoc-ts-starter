@@ -1,5 +1,6 @@
 import { type TestCase, parseArgs, runBenchmark } from '@lib/bench';
 import { StringView } from '@lib/string-view';
+import { StringViewBenchmarks } from './types';
 
 // Test data with various content types and sizes
 const testData = {
@@ -31,14 +32,13 @@ const testData = {
 };
 
 const testCases: TestCase[] = [
-    // Construction tests
     {
-        name: 'create-small',
+        name: StringViewBenchmarks.CREATE_SMALL,
         fn: (str: string) => new StringView(str),
         setup: () => testData.smallAscii,
     },
     {
-        name: 'create-large',
+        name: StringViewBenchmarks.CREATE_LARGE,
         fn: (str: string) => new StringView(str),
         setup: () => testData.largeAscii,
     },

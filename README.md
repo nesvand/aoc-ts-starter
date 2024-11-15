@@ -43,6 +43,8 @@ Options:
   -r, --runs    Number of benchmark runs          [number] [default: 1000]
   -h, --help    Show help                         [boolean]
 
+View the latest benchmark results in [BENCHMARKS.md](lib/bench/BENCHMARKS.md).
+
 ## Usage
 
 The project uses [Bun](https://bun.sh) for the javascript runtime, package manager, and for testing.
@@ -59,6 +61,8 @@ bun gen day01
 bun test day01
 # run day01
 bun start day01
+# run all benchmarks
+bun run lib/bench/run-all.ts
 ```
 
 ## Generate
