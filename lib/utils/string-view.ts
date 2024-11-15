@@ -50,35 +50,35 @@ export function isDigit(char?: string) {
  * work in a non-destructive way with strings.
  */
 export class StringView {
-    private _source: string;
-    start = 0;
-    size: number;
+    #source: string;
+    #start = 0;
+    #size: number;
 
     constructor(data: string) {
-        this._source = data;
-        this.size = data.length;
+        this.#source = data;
+        this.#size = data.length;
     }
 
     static fromStringView(sv: StringView) {
         const copy = new StringView('');
-        copy._source = sv._source;
-        copy.start = sv.start;
-        copy.size = sv.size;
+        copy.#source = sv.#source;
+        copy.#start = sv.#start;
+        copy.#size = sv.#size;
 
         return copy;
     }
 
     static fromParts(source: string, start: number, size: number) {
         const copy = new StringView('');
-        copy._source = source;
-        copy.start = start;
-        copy.size = size;
+        copy.#source = source;
+        copy.#start = start;
+        copy.#size = size;
 
         return copy;
     }
 
     private get data() {
-        return this._source.substring(this.start, this.start + this.size);
+        return this.#source.substring(this.#start, this.#start + this.#size);
     }
 
     public charAt(index: number): string {
@@ -115,7 +115,7 @@ export class StringView {
             i++;
         }
 
-        return StringView.fromParts(this._source, this.start + i, this.size - i);
+        return StringView.fromParts(this.#source, this.#start + i, this.#size - i);
     }
 
     public trimRight() {
@@ -124,7 +124,7 @@ export class StringView {
             i++;
         }
 
-        return StringView.fromParts(this._source, this.start, this.size - i);
+        return StringView.fromParts(this.#source, this.#start, this.#size - i);
     }
 
     public trim() {
@@ -137,7 +137,7 @@ export class StringView {
             i++;
         }
 
-        return StringView.fromParts(this._source, this.start, i);
+        return StringView.fromParts(this.#source, this.#start, i);
     }
 
     public chopLeft(size: number) {
@@ -146,9 +146,9 @@ export class StringView {
             _size = this.data.length;
         }
 
-        const result = StringView.fromParts(this._source, this.start, _size);
-        this.start += _size;
-        this.size -= _size;
+        const result = StringView.fromParts(this.#source, this.#start, _size);
+        this.#start += _size;
+        this.#size -= _size;
 
         return result;
     }
@@ -159,8 +159,8 @@ export class StringView {
             _size = this.data.length;
         }
 
-        const result = StringView.fromParts(this._source, this.start + this.size - _size, _size);
-        this.size -= _size;
+        const result = StringView.fromParts(this.#source, this.#start + this.#size - _size, _size);
+        this.#size -= _size;
 
         return result;
     }
@@ -171,11 +171,11 @@ export class StringView {
             i++;
         }
 
-        const data = StringView.fromParts(this._source, this.start, i);
+        const data = StringView.fromParts(this.#source, this.#start, i);
 
-        if (i < this.size) {
-            this.start += i + 1;
-            this.size -= i + 1;
+        if (i < this.#size) {
+            this.#start += i + 1;
+            this.#size -= i + 1;
             return { data, success: true };
         }
 
@@ -188,35 +188,35 @@ export class StringView {
             i++;
         }
 
-        const result = StringView.fromParts(this._source, this.start, i);
+        const result = StringView.fromParts(this.#source, this.#start, i);
 
-        if (i < this.size) {
-            this.start += i + 1;
-            this.size -= i + 1;
+        if (i < this.#size) {
+            this.#start += i + 1;
+            this.#size -= i + 1;
         } else {
-            this.start += i;
-            this.size -= i;
+            this.#start += i;
+            this.#size -= i;
         }
 
         return result;
     }
 
     public chopByStringView(delim: StringView) {
-        const window = StringView.fromParts(this._source, this.start, delim.size);
+        const window = StringView.fromParts(this.#source, this.#start, delim.#size);
         let i = 0;
-        while (i + delim.size < this.size && !window.eq(delim)) {
+        while (i + delim.#size < this.#size && !window.eq(delim)) {
             i++;
-            window.start++;
+            window.#start++;
         }
 
-        const result = StringView.fromParts(this._source, this.start, i);
+        const result = StringView.fromParts(this.#source, this.#start, i);
 
-        if (i + delim.size === this.size) {
-            result.size += delim.size;
+        if (i + delim.#size === this.#size) {
+            result.#size += delim.#size;
         }
 
-        this.start += i + delim.size;
-        this.size -= i + delim.size;
+        this.#start += i + delim.#size;
+        this.#size -= i + delim.#size;
 
         return result;
     }
@@ -269,18 +269,18 @@ export class StringView {
         let sign = 1;
         if (this.data.charAt(0) === '-') {
             sign = -1;
-            this.start++;
-            this.size--;
+            this.#start++;
+            this.#size--;
         } else if (this.data.charAt(0) === '+') {
-            this.start++;
-            this.size--;
+            this.#start++;
+            this.#size--;
         }
 
         let result = 0;
-        while (this.size > 0 && isDigit(this.charAt(0))) {
+        while (this.#size > 0 && isDigit(this.charAt(0))) {
             result = result * 10 + Number.parseInt(this.charAt(0));
-            this.start++;
-            this.size--;
+            this.#start++;
+            this.#size--;
         }
 
         return result * sign;
@@ -290,17 +290,17 @@ export class StringView {
         let sign = 1;
         if (this.data.charAt(0) === '-') {
             sign = -1;
-            this.start++;
-            this.size--;
+            this.#start++;
+            this.#size--;
         } else if (this.data.charAt(0) === '+') {
-            this.start++;
-            this.size--;
+            this.#start++;
+            this.#size--;
         }
 
         let result = 0.0;
         let decimal = 0.0;
 
-        while (this.size > 0) {
+        while (this.#size > 0) {
             if (this.charAt(0) === '.') {
                 decimal = 1.0;
             } else if (!isDigit(this.charAt(0))) {
@@ -314,8 +314,8 @@ export class StringView {
                 }
             }
 
-            this.start++;
-            this.size--;
+            this.#start++;
+            this.#size--;
         }
 
         return result * sign;
@@ -327,14 +327,22 @@ export class StringView {
             i++;
         }
 
-        const result = StringView.fromParts(this._source, this.start, i);
-        this.start += i;
-        this.size -= i;
+        const result = StringView.fromParts(this.#source, this.#start, i);
+        this.#start += i;
+        this.#size -= i;
 
         return result;
     }
 
     get source() {
-        return this._source;
+        return this.#source;
+    }
+
+    get start() {
+        return this.#start;
+    }
+
+    get size() {
+        return this.#size;
     }
 }
