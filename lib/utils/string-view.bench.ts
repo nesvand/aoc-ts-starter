@@ -1,58 +1,58 @@
-import { type TestCase, runBenchmark, parseArgs } from "@lib/bench";
-import { StringView } from "@lib/string-view";
+import { type TestCase, parseArgs, runBenchmark } from '@lib/bench';
+import { StringView } from '@lib/string-view';
 
 // Test data with various content types and sizes
 const testData = {
     // ASCII only
-    smallAscii: "hello world",
-    mediumAscii: "hello world".repeat(10),
-    largeAscii: "hello world".repeat(100),
+    smallAscii: 'hello world',
+    mediumAscii: 'hello world'.repeat(10),
+    largeAscii: 'hello world'.repeat(100),
 
     // Mixed content (ASCII, emoji, CJK)
-    smallMixed: "Hello 👋 世界",
-    mediumMixed: "Hello 👋 世界 ".repeat(10),
-    largeMixed: "Hello 👋 世界 ".repeat(100),
+    smallMixed: 'Hello 👋 世界',
+    mediumMixed: 'Hello 👋 世界 '.repeat(10),
+    largeMixed: 'Hello 👋 世界 '.repeat(100),
 
     // Whitespace handling
-    leadingWhitespace: "   \t\n\rHello",
-    trailingWhitespace: "Hello   \t\n\r",
-    mixedWhitespace: "   Hello   World   ",
+    leadingWhitespace: '   \t\n\rHello',
+    trailingWhitespace: 'Hello   \t\n\r',
+    mixedWhitespace: '   Hello   World   ',
 
     // Numbers
-    integers: "12345678901234567890",
-    floats: "123.456.789",
-    
+    integers: '12345678901234567890',
+    floats: '123.456.789',
+
     // Complex emoji sequences
-    complexEmoji: "👨‍👩‍👧‍👦 👨🏻‍💻 🏳️‍🌈",
+    complexEmoji: '👨‍👩‍👧‍👦 👨🏻‍💻 🏳️‍🌈',
 
     // Number chopping
-    mixedIntegers: "123 -456 +789 abc 101112",
-    mixedFloats: "123.456 -789.012 +345.678 abc 901.234",
+    mixedIntegers: '123 -456 +789 abc 101112',
+    mixedFloats: '123.456 -789.012 +345.678 abc 901.234',
 };
 
 const testCases: TestCase[] = [
     // Construction tests
     {
-        name: "create-small",
+        name: 'create-small',
         fn: (str: string) => new StringView(str),
         setup: () => testData.smallAscii,
     },
     {
-        name: "create-large",
+        name: 'create-large',
         fn: (str: string) => new StringView(str),
         setup: () => testData.largeAscii,
     },
 
     // Basic operations
     {
-        name: "charAt-ascii",
+        name: 'charAt-ascii',
         fn: (sv: StringView) => {
             for (let i = 0; i < 10; i++) sv.charAt(i);
         },
         setup: () => new StringView(testData.mediumAscii),
     },
     {
-        name: "charAt-unicode",
+        name: 'charAt-unicode',
         fn: (sv: StringView) => {
             for (let i = 0; i < 10; i++) sv.charAt(i);
         },
@@ -61,73 +61,77 @@ const testCases: TestCase[] = [
 
     // Iteration
     {
-        name: "iterate-ascii",
+        name: 'iterate-ascii',
         fn: (sv: StringView) => {
-            for (const _ of sv) { /* noop */ }
+            for (const _ of sv) {
+                /* noop */
+            }
         },
         setup: () => new StringView(testData.mediumAscii),
     },
     {
-        name: "iterate-unicode",
+        name: 'iterate-unicode',
         fn: (sv: StringView) => {
-            for (const _ of sv) { /* noop */ }
+            for (const _ of sv) {
+                /* noop */
+            }
         },
         setup: () => new StringView(testData.mediumMixed),
     },
 
     // Whitespace handling
     {
-        name: "trim-small",
+        name: 'trim-small',
         fn: (sv: StringView) => sv.trim(),
         setup: () => new StringView(testData.mixedWhitespace),
     },
     {
-        name: "trim-large",
+        name: 'trim-large',
         fn: (sv: StringView) => sv.trim(),
         setup: () => new StringView(`   ${testData.largeMixed}   `),
     },
 
     // Chopping operations
     {
-        name: "chopLeft-ascii",
+        name: 'chopLeft-ascii',
         fn: (sv: StringView) => sv.chopLeft(5),
         setup: () => new StringView(testData.mediumAscii),
     },
     {
-        name: "chopLeft-unicode",
+        name: 'chopLeft-unicode',
         fn: (sv: StringView) => sv.chopLeft(5),
         setup: () => new StringView(testData.mediumMixed),
     },
 
     // Parsing operations
     {
-        name: "parseInt",
+        name: 'parseInt',
         fn: (sv: StringView) => sv.toInt(),
         setup: () => new StringView(testData.integers),
     },
     {
-        name: "parseFloat",
+        name: 'parseFloat',
         fn: (sv: StringView) => sv.toFloat(),
         setup: () => new StringView(testData.floats),
     },
 
     // Complex operations
     {
-        name: "complex-emoji-handling",
+        name: 'complex-emoji-handling',
         fn: (sv: StringView) => {
-            sv.charAt(0);  // Should handle the family emoji correctly
-            sv.charAt(2);  // Should handle the technologist emoji correctly
-            sv.charAt(4);  // Should handle the rainbow flag correctly
+            sv.charAt(0); // Should handle the family emoji correctly
+            sv.charAt(2); // Should handle the technologist emoji correctly
+            sv.charAt(4); // Should handle the rainbow flag correctly
         },
         setup: () => new StringView(testData.complexEmoji),
     },
 
     // Cache effectiveness
     {
-        name: "cached-segmentation",
+        name: 'cached-segmentation',
         fn: (sv: StringView) => {
             for (let i = 0; i < 10; i++) {
-                sv.graphemeLength;  // Should use cache after first call
+                sv.graphemeLength; // Should use cache after first call
             }
         },
         setup: () => new StringView(testData.mediumMixed),
@@ -135,17 +139,17 @@ const testCases: TestCase[] = [
 
     // Number chopping operations
     {
-        name: "chopInt-simple",
+        name: 'chopInt-simple',
         fn: (sv: StringView) => sv.chopInt(),
-        setup: () => new StringView("12345"),
+        setup: () => new StringView('12345'),
     },
     {
-        name: "chopInt-signed",
+        name: 'chopInt-signed',
         fn: (sv: StringView) => sv.chopInt(),
-        setup: () => new StringView("-12345"),
+        setup: () => new StringView('-12345'),
     },
     {
-        name: "chopInt-mixed",
+        name: 'chopInt-mixed',
         fn: (sv: StringView) => {
             const view = new StringView(testData.mixedIntegers);
             const results = [];
@@ -160,17 +164,17 @@ const testCases: TestCase[] = [
         setup: () => null, // Setup is handled in fn
     },
     {
-        name: "chopFloat-simple",
+        name: 'chopFloat-simple',
         fn: (sv: StringView) => sv.chopFloat(),
-        setup: () => new StringView("123.456"),
+        setup: () => new StringView('123.456'),
     },
     {
-        name: "chopFloat-signed",
+        name: 'chopFloat-signed',
         fn: (sv: StringView) => sv.chopFloat(),
-        setup: () => new StringView("-123.456"),
+        setup: () => new StringView('-123.456'),
     },
     {
-        name: "chopFloat-mixed",
+        name: 'chopFloat-mixed',
         fn: (sv: StringView) => {
             const view = new StringView(testData.mixedFloats);
             const results = [];
@@ -188,4 +192,4 @@ const testCases: TestCase[] = [
 
 // Run the benchmark
 const { functionName, options } = parseArgs(process.argv);
-runBenchmark(functionName, testCases, options); 
+runBenchmark(functionName, testCases, options);

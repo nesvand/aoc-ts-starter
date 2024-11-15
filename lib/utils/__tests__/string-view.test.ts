@@ -36,7 +36,7 @@ describe('@lib/utils/string-view', () => {
             test('iteration', () => {
                 const sv = new StringView('test');
                 expect([...sv]).toEqual(['t', 'e', 's', 't']);
-                
+
                 const chars: string[] = [];
                 for (const char of sv) {
                     chars.push(char);
@@ -88,15 +88,15 @@ describe('@lib/utils/string-view', () => {
                     const sv = new StringView('1234test');
                     expect(sv.chopLeft(-1).toString()).toBe('');
                     expect(sv.toString()).toBe('1234test');
-                    
+
                     const sv2 = new StringView('1234test');
                     expect(sv2.chopLeft(0).toString()).toBe('');
                     expect(sv2.toString()).toBe('1234test');
-                    
+
                     const sv3 = new StringView('1234test');
                     expect(sv3.chopLeft(8).toString()).toBe('1234test');
                     expect(sv3.toString()).toBe('');
-                    
+
                     const sv4 = new StringView('1234test');
                     expect(sv4.chopLeft(100).toString()).toBe('1234test');
                     expect(sv4.toString()).toBe('');
@@ -114,15 +114,15 @@ describe('@lib/utils/string-view', () => {
                     const sv1 = new StringView('1234test');
                     expect(sv1.chopRight(-1).toString()).toBe('');
                     expect(sv1.toString()).toBe('1234test');
-                    
+
                     const sv2 = new StringView('1234test');
                     expect(sv2.chopRight(0).toString()).toBe('');
                     expect(sv2.toString()).toBe('1234test');
-                    
+
                     const sv3 = new StringView('1234test');
                     expect(sv3.chopRight(8).toString()).toBe('1234test');
                     expect(sv3.toString()).toBe('');
-                    
+
                     const sv4 = new StringView('1234test');
                     expect(sv4.chopRight(100).toString()).toBe('1234test');
                     expect(sv4.toString()).toBe('');
@@ -239,13 +239,13 @@ describe('@lib/utils/string-view', () => {
 
                 test('invalid integers', () => {
                     const cases = [
-                        '',           // empty string
-                        'abc',        // no digits
-                        '-abc',       // sign only
-                        '+abc',       // sign only
-                        '+-123',      // invalid sign
-                        '--123',      // multiple signs
-                        '++123',      // multiple signs
+                        '', // empty string
+                        'abc', // no digits
+                        '-abc', // sign only
+                        '+abc', // sign only
+                        '+-123', // invalid sign
+                        '--123', // multiple signs
+                        '++123', // multiple signs
                     ];
 
                     for (const testCase of cases) {
@@ -259,7 +259,7 @@ describe('@lib/utils/string-view', () => {
 
                 test('sequential integer chopping', () => {
                     const sv = new StringView('123 456 789');
-                    
+
                     const result1 = sv.chopInt();
                     expect(result1.success).toBe(true);
                     expect(result1.data).toBe(123);
@@ -319,16 +319,16 @@ describe('@lib/utils/string-view', () => {
 
                 test('invalid floats', () => {
                     const cases = [
-                        '',           // empty string
-                        'abc',        // no digits
-                        '-abc',       // sign only
-                        '+abc',       // sign only
-                        '+-123.456',  // invalid sign
-                        '--123.456',  // multiple signs
-                        '++123.456',  // multiple signs
-                        '.',          // decimal point only
-                        '+.',         // sign and decimal only
-                        '-.',         // sign and decimal only
+                        '', // empty string
+                        'abc', // no digits
+                        '-abc', // sign only
+                        '+abc', // sign only
+                        '+-123.456', // invalid sign
+                        '--123.456', // multiple signs
+                        '++123.456', // multiple signs
+                        '.', // decimal point only
+                        '+.', // sign and decimal only
+                        '-.', // sign and decimal only
                     ];
 
                     for (const testCase of cases) {
@@ -342,7 +342,7 @@ describe('@lib/utils/string-view', () => {
 
                 test('sequential float chopping', () => {
                     const sv = new StringView('123.45 -456.78 +789.01');
-                    
+
                     const result1 = sv.chopFloat();
                     expect(result1.success).toBe(true);
                     expect(result1.data).toBeCloseTo(123.45);

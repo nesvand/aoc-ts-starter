@@ -31,13 +31,15 @@ export function isDigit(char?: string): boolean {
 }
 
 /** Result type for operations that might fail */
-export type Result<T> = {
-    success: true;
-    data: T;
-} | {
-    success: false;
-    data?: undefined;
-};
+export type Result<T> =
+    | {
+          success: true;
+          data: T;
+      }
+    | {
+          success: false;
+          data?: undefined;
+      };
 
 /**
  * A utility class for parsing strings in an immutable way. Memory is only allocated
@@ -50,10 +52,10 @@ export class StringView {
     #size: number;
     // Cache segmenter and segments
     #segmenter?: Intl.Segmenter;
-    #segments?: Array<{ segment: string; index: number; }>;
+    #segments?: Array<{ segment: string; index: number }>;
     // Cache for computed values
     #lengthInGraphemes?: number;
-    #trimmedIndices?: { start: number; end: number; };
+    #trimmedIndices?: { start: number; end: number };
 
     /**
      * Gets or creates the segmenter instance
@@ -70,7 +72,7 @@ export class StringView {
      * Gets or computes the segments for the current view
      * @private
      */
-    private getSegments(): Array<{ segment: string; index: number; }> {
+    private getSegments(): Array<{ segment: string; index: number }> {
         if (!this.#segments) {
             this.#segments = [...this.getSegmenter().segment(this.data)];
         }
@@ -235,7 +237,7 @@ export class StringView {
     public trim(): StringView {
         const { start, end } = this.getTrimmedIndices();
         const segments = this.getSegments();
-        
+
         if (start > end) {
             return StringView.fromParts(this.#source, this.#start, 0);
         }
@@ -245,7 +247,7 @@ export class StringView {
         const startOffset = startSegment.index;
         const endSegment = segments[end];
         if (!endSegment) throw new Error('Invalid segment index when creating StringView');
-        const size = (endSegment.index + endSegment.segment.length) - startOffset;
+        const size = endSegment.index + endSegment.segment.length - startOffset;
 
         return StringView.fromParts(this.#source, this.#start + startOffset, size);
     }
@@ -318,7 +320,7 @@ export class StringView {
         const str = this.data;
         const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
         const segments = [...segmenter.segment(str)];
-        
+
         // Get delimiter graphemes
         const delimSegments = [...segmenter.segment(delim)];
         const delimLength = delimSegments.length;
@@ -329,10 +331,10 @@ export class StringView {
             // Check if current position could be the start of the delimiter
             const remainingSegments = segments.slice(i);
             const potentialDelim = remainingSegments
-                .slice(0, delimLength)  // Take enough segments for the delimiter
-                .map(s => s.segment)
+                .slice(0, delimLength) // Take enough segments for the delimiter
+                .map((s) => s.segment)
                 .join('');
-            
+
             if (potentialDelim === delim) {
                 // Found the delimiter
                 const upToDelim = segments.slice(0, i);
@@ -410,11 +412,11 @@ export class StringView {
     public toInt(): number {
         const str = this.data;
         const len = str.length;
-        
+
         // Pre-allocate buffer for digits
         const digits = new Int8Array(len);
         let digitCount = 0;
-        
+
         let sign = 1;
         let i = 0;
 
@@ -504,7 +506,7 @@ export class StringView {
         return this.#size;
     }
 
-    /** 
+    /**
      * Gets the current view of the string.
      * This is where memory allocation happens, as it creates a new string
      * from the current view parameters.
@@ -546,7 +548,7 @@ export class StringView {
         if (size <= 0) {
             return StringView.fromParts(this.#source, this.#start, 0);
         }
-        
+
         // If size exceeds available segments, take everything
         if (size >= segments.length) {
             const result = StringView.fromStringView(this);
@@ -557,8 +559,7 @@ export class StringView {
 
         // Calculate byte offset for the requested number of graphemes
         const actualSize = Math.min(size, segments.length);
-        const byteOffset = (segments[actualSize - 1]?.index ?? 0) + 
-                          (segments[actualSize - 1]?.segment.length ?? 0);
+        const byteOffset = (segments[actualSize - 1]?.index ?? 0) + (segments[actualSize - 1]?.segment.length ?? 0);
 
         const result = StringView.fromParts(this.#source, this.#start, byteOffset);
         this.#start += byteOffset;
@@ -583,7 +584,7 @@ export class StringView {
         if (size <= 0) {
             return StringView.fromParts(this.#source, this.#start, 0);
         }
-        
+
         // If size exceeds available segments, take everything
         if (size >= segments.length) {
             const result = StringView.fromStringView(this);
@@ -613,7 +614,7 @@ export class StringView {
         const str = this.data;
         const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
         const segments = [...segmenter.segment(str)];
-        
+
         // Get delimiter graphemes
         const delimSegments = [...segmenter.segment(delim)];
         const delimLength = delimSegments.length;
@@ -625,9 +626,9 @@ export class StringView {
             const remainingSegments = segments.slice(i);
             const potentialDelim = remainingSegments
                 .slice(0, delimLength)
-                .map(s => s.segment)
+                .map((s) => s.segment)
                 .join('');
-            
+
             if (potentialDelim === delim) {
                 // Found the delimiter
                 const upToDelim = segments.slice(0, i);
@@ -682,7 +683,7 @@ export class StringView {
     /**
      * Gets the trimmed indices, cached
      */
-    private getTrimmedIndices(): { start: number; end: number; } {
+    private getTrimmedIndices(): { start: number; end: number } {
         if (!this.#trimmedIndices) {
             const segments = this.getSegments();
             let start = 0;
@@ -784,4 +785,3 @@ export class StringView {
         return { success: true, data: result };
     }
 }
-

@@ -40,7 +40,7 @@ function formatTime(ms: number): string {
 }
 
 export function runBenchmark(testName: string, testCases: TestCase[], options: BenchmarkOptions) {
-    const testCase = testCases.find(t => t.name === testName);
+    const testCase = testCases.find((t) => t.name === testName);
     if (!testCase) {
         console.error(`No test case found for "${testName}"`);
         process.exit(1);
@@ -49,11 +49,14 @@ export function runBenchmark(testName: string, testCases: TestCase[], options: B
     const data = testCase.setup();
     console.log(chalk.bold(`\nBenchmarking ${chalk.cyan(testName)}`));
 
-    const multibar = new cliProgress.MultiBar({
-        clearOnComplete: false,
-        hideCursor: true,
-        format: '{bar} {percentage}% | {value}/{total} {task}',
-    }, cliProgress.Presets.shades_classic);
+    const multibar = new cliProgress.MultiBar(
+        {
+            clearOnComplete: false,
+            hideCursor: true,
+            format: '{bar} {percentage}% | {value}/{total} {task}',
+        },
+        cliProgress.Presets.shades_classic,
+    );
 
     const warmupBar = multibar.create(options.warmup, 0, { task: 'Warmup' });
     for (let i = 0; i < options.warmup; i++) {
@@ -78,8 +81,12 @@ export function runBenchmark(testName: string, testCases: TestCase[], options: B
 
     console.log('\nResults:');
     console.log('─'.repeat(50));
-    console.log(`${chalk.bold('Mean:')}      ${chalk.green(formatTime(stats.mean))} ±${chalk.yellow(formatTime(stats.stdDev))}`);
-    console.log(`${chalk.bold('Range:')}     ${chalk.blue(formatTime(stats.min))} to ${chalk.blue(formatTime(stats.max))}`);
+    console.log(
+        `${chalk.bold('Mean:')}      ${chalk.green(formatTime(stats.mean))} ±${chalk.yellow(formatTime(stats.stdDev))}`,
+    );
+    console.log(
+        `${chalk.bold('Range:')}     ${chalk.blue(formatTime(stats.min))} to ${chalk.blue(formatTime(stats.max))}`,
+    );
     console.log(`${chalk.bold('Samples:')}   ${chalk.white(options.runs.toLocaleString())} runs`);
     if (options.warmup > 0) {
         console.log(`${chalk.bold('Warmup:')}    ${chalk.white(options.warmup.toLocaleString())} iterations`);
@@ -119,4 +126,4 @@ export function parseArgs(args: string[]): { functionName: string; options: Benc
             runs: argv.runs,
         },
     };
-} 
+}
