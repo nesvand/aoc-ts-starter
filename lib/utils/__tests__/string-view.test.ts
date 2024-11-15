@@ -224,7 +224,8 @@ describe('@lib/utils/string-view', () => {
                 expect(isWhitespace('a')).toBe(false);
                 expect(isWhitespace('')).toBe(false);
                 expect(isWhitespace(undefined)).toBe(false);
-                expect(isWhitespace(null)).toBe(false);
+                // biome-ignore lint/suspicious/noExplicitAny: Any is used to test null
+                expect(isWhitespace(null as any)).toBe(false);
             });
         });
 
@@ -237,7 +238,8 @@ describe('@lib/utils/string-view', () => {
                 expect(isDigit(' ')).toBe(false);
                 expect(isDigit('')).toBe(false);
                 expect(isDigit(undefined)).toBe(false);
-                expect(isDigit(null)).toBe(false);
+                // biome-ignore lint/suspicious/noExplicitAny: Any is used to test null
+                expect(isDigit(null as any)).toBe(false);
             });
         });
     });

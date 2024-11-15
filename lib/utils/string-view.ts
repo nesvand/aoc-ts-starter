@@ -249,9 +249,12 @@ export class StringView {
                     this.#size -= afterDelim.index;
                     return result;
                 }
-
                 // Create result up to delimiter
-                const result = StringView.fromParts(this.#source, this.#start, segments[i].index);
+                const segment = segments[i];
+                if (!segment) {
+                    throw new Error('Invalid segment index when creating StringView');
+                }
+                const result = StringView.fromParts(this.#source, this.#start, segment.index);
 
                 // Move past delimiter
                 const afterDelim = segments[i + delimLength];
