@@ -360,6 +360,59 @@ describe('@lib/utils/string-view', () => {
                 });
             });
         });
+
+        describe('reset', () => {
+            test('should reset to initial state of current source', () => {
+                const sv = new StringView('test string');
+                sv.chopLeft(5); // chops 'test '
+                expect(sv.toString()).toBe('string');
+
+                sv.reset();
+                expect(sv.toString()).toBe('test string');
+            });
+
+            test('should reset with new content', () => {
+                const sv = new StringView('test string');
+                sv.chopLeft(5); // chops 'test '
+                expect(sv.toString()).toBe('string');
+
+                sv.reset('new content');
+                expect(sv.toString()).toBe('new content');
+            });
+
+            test('should reset internal state for parsing operations', () => {
+                const sv = new StringView('123 456');
+                const first = sv.chopInt();
+                expect(first.success).toBe(true);
+                expect(first.data).toBe(123);
+                expect(sv.toString()).toBe(' 456');
+
+                sv.reset();
+                const second = sv.chopInt();
+                expect(second.success).toBe(true);
+                expect(second.data).toBe(123);
+                expect(sv.toString()).toBe(' 456');
+            });
+
+            test('should handle empty string reset', () => {
+                const sv = new StringView('test');
+                sv.reset('');
+                expect(sv.toString()).toBe('');
+                expect(sv.size).toBe(0);
+            });
+
+            test('should maintain functionality after reset', () => {
+                const sv = new StringView('test');
+                sv.reset('123.456 abc');
+
+                const num = sv.chopFloat();
+                expect(num.success).toBe(true);
+                expect(num.data).toBeCloseTo(123.456);
+
+                sv.trimLeft();
+                expect(sv.toString()).toBe('abc');
+            });
+        });
     });
 
     describe('utility functions', () => {

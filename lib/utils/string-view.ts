@@ -784,4 +784,22 @@ export class StringView {
         this.#size -= i;
         return { success: true, data: result };
     }
+
+    /**
+     * Resets the StringView with new content or resets to initial state
+     * @param newSource - Optional new source string. If not provided, resets to start of current source
+     */
+    public reset(newSource?: string): void {
+        if (newSource !== undefined) {
+            this.#source = newSource;
+            this.#size = newSource.length;
+        }
+        this.#start = 0;
+        this.#size = newSource?.length ?? this.#source.length;
+        // Reset all caches
+        this.#segmenter = undefined;
+        this.#segments = undefined;
+        this.#lengthInGraphemes = undefined;
+        this.#trimmedIndices = undefined;
+    }
 }

@@ -22,15 +22,13 @@ The project includes a robust `StringView` class for efficient string manipulati
   - Unicode whitespace handling
 
 - **String Operations**
-  - Efficient substring operations without allocation
   - Delimiter-based string splitting (including multi-character delimiters)
   - Comprehensive whitespace trimming
-  - Case-insensitive comparisons
+  - Instance reuse through reset functionality
 
 - **Number Parsing**
   - Integer parsing with sign handling
   - Floating-point parsing with proper precision
-  - Robust error handling for malformed inputs
 
 ### Benchmarking
 Built-in benchmarking utilities for performance testing:
@@ -63,6 +61,26 @@ bun test day01
 bun start day01
 # run all benchmarks
 bun run lib/bench/run-all.ts
+```
+
+### Using StringView
+
+StringView provides efficient string manipulation without unnecessary allocations:
+
+```typescript
+// Create a StringView instance
+const sv = new StringView("Hello World");
+
+// Parse numbers
+sv.reset("123.456");
+const num = sv.chopFloat(); // { success: true, data: 123.456 }
+
+// Reuse the instance
+sv.reset("Another string");
+const word = sv.chopLeftWhile(c => !isWhitespace(c));
+
+// Reset to initial state
+sv.reset();
 ```
 
 ## Generate
