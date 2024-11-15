@@ -48,6 +48,39 @@ export class StringView {
     #source: string;
     #start = 0;
     #size: number;
+    // Cache segmenter and segments
+    #segmenter?: Intl.Segmenter;
+    #segments?: Array<{ segment: string; index: number; }>;
+
+    /**
+     * Gets or creates the segmenter instance
+     * @private
+     */
+    private getSegmenter(): Intl.Segmenter {
+        if (!this.#segmenter) {
+            this.#segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+        }
+        return this.#segmenter;
+    }
+
+    /**
+     * Gets or computes the segments for the current view
+     * @private
+     */
+    private getSegments(): Array<{ segment: string; index: number; }> {
+        if (!this.#segments) {
+            this.#segments = [...this.getSegmenter().segment(this.data)];
+        }
+        return this.#segments;
+    }
+
+    /**
+     * Invalidates the segment cache when the view changes
+     * @private
+     */
+    private invalidateCache(): void {
+        this.#segments = undefined;
+    }
 
     /**
      * Creates a new StringView from a string
@@ -448,9 +481,8 @@ export class StringView {
      * @returns A new StringView containing the chopped characters
      */
     public chopLeft(size: number): StringView {
-        const str = this.data;
-        const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
-        const segments = [...segmenter.segment(str)];
+        // Use cached segments
+        const segments = this.getSegments();
 
         // Handle negative and overflow cases
         if (size <= 0) {
@@ -473,6 +505,9 @@ export class StringView {
         const result = StringView.fromParts(this.#source, this.#start, byteOffset);
         this.#start += byteOffset;
         this.#size -= byteOffset;
+
+        // Invalidate cache after modifying the view
+        this.invalidateCache();
         return result;
     }
 
