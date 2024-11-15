@@ -219,5 +219,95 @@ describe('@lib/utils/array', () => {
                 ]);
             });
         });
+
+        describe('iterator reuse', () => {
+            it('should allow reusing iterator with new array', () => {
+                const iterator = new RollingWindowIterator([1, 2, 3], 2);
+
+                const firstResult = [...iterator];
+                expect(firstResult).toEqual([
+                    [1, 2],
+                    [2, 3],
+                ]);
+
+                iterator.reset([4, 5, 6, 7]);
+                const secondResult = [...iterator];
+                expect(secondResult).toEqual([
+                    [4, 5],
+                    [5, 6],
+                    [6, 7],
+                ]);
+            });
+
+            it('should allow reusing iterator with new window size', () => {
+                const iterator = new RollingWindowIterator([1, 2, 3, 4], 2);
+
+                const firstResult = [...iterator];
+                expect(firstResult).toEqual([
+                    [1, 2],
+                    [2, 3],
+                    [3, 4],
+                ]);
+
+                iterator.reset(undefined, 3);
+                const secondResult = [...iterator];
+                expect(secondResult).toEqual([
+                    [1, 2, 3],
+                    [2, 3, 4],
+                ]);
+            });
+
+            it('should maintain cache behavior after reset', () => {
+                const iterator = new RollingWindowIterator([1, 2, 3], 2);
+                iterator.cacheAll();
+
+                const watchedArray = iterator.getArray();
+                watchedArray[0] = 10;
+
+                const firstResult = [...iterator];
+                expect(firstResult).toEqual([
+                    [10, 2],
+                    [2, 3],
+                ]);
+
+                iterator.reset([4, 5, 6]);
+                iterator.cacheAll();
+
+                const newWatchedArray = iterator.getArray();
+                newWatchedArray[0] = 40;
+
+                const secondResult = [...iterator];
+                expect(secondResult).toEqual([
+                    [40, 5],
+                    [5, 6],
+                ]);
+            });
+
+            it('should reuse iterator in rollingWindow function', () => {
+                const firstResult = [...rollingWindow([1, 2, 3], 2)];
+                expect(firstResult).toEqual([
+                    [1, 2],
+                    [2, 3],
+                ]);
+
+                const secondResult = [...rollingWindow([4, 5, 6, 7], 3)];
+                expect(secondResult).toEqual([
+                    [4, 5, 6],
+                    [5, 6, 7],
+                ]);
+
+                // Verify that multiple concurrent iterations work correctly
+                const iter1 = [...rollingWindow([1, 2, 3], 2)];
+                const iter2 = [...rollingWindow([4, 5, 6], 2)];
+                expect(iter1).toEqual([
+                    [1, 2],
+                    [2, 3],
+                ]);
+                expect(iter2).toEqual([
+                    [4, 5],
+                    [5, 6],
+                ]);
+            });
+        });
     });
 });
