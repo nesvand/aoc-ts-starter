@@ -379,12 +379,41 @@ export class StringView {
      * @returns The parsed integer value, or 0 if invalid
      */
     public toInt(): number {
-        const firstChar = this.data.charAt(0);
-        const sign = firstChar === '-' ? -1 : 1;
-        const offset = ['-', '+'].includes(firstChar) ? 1 : 0;
+        const str = this.data;
+        const len = str.length;
+        
+        // Pre-allocate buffer for digits
+        const digits = new Int8Array(len);
+        let digitCount = 0;
+        
+        let sign = 1;
+        let i = 0;
 
-        const digits = this.data.slice(offset).match(/^\d+/)?.[0] ?? '';
-        return sign * [...digits].reduce((acc, digit) => acc * 10 + (Number.parseInt(digit) ?? 0), 0);
+        // Handle sign
+        if (str[0] === '-') {
+            sign = -1;
+            i++;
+        } else if (str[0] === '+') {
+            i++;
+        }
+
+        // Convert to digits first
+        for (; i < len; i++) {
+            const char = str[i];
+            if (!char) throw new Error('Invalid character index when parsing integer');
+            if (!isDigit(char)) break;
+            digits[digitCount++] = char.charCodeAt(0) - 48; // '0' is 48 in ASCII
+        }
+
+        // Calculate result using TypedArray
+        let result = 0;
+        for (let j = 0; j < digitCount; j++) {
+            const digit = digits[j];
+            if (digit === undefined) throw new Error('Invalid digit index when parsing integer');
+            result = result * 10 + digit;
+        }
+
+        return result * sign;
     }
 
     /**
