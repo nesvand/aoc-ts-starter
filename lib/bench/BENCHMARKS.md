@@ -1,58 +1,58 @@
 # Benchmark Results
 
-Generated on: 2024-11-15T07:37:08.545Z
+Generated on: 2024-11-15T10:58:03.804Z
 
 
 ## Array Benchmarks
 
 | Benchmark | Mean | Margin | Operations/sec |
 |-----------|------|--------|---------------|
-| max | 275.33µs | ±163.91µs | 3,632.01 |
-| splitOn | 639.96µs | ±248.09µs | 1,562.6 |
-| chunk | 1.09ms | ±360.39µs | 917.43 |
-| rollingWindow | 8.28ms | ±1.79ms | 120.77 |
+| max | 294.08µs | ±276.13µs | 3,400.44 |
+| splitOn | 670.50µs | ±253.99µs | 1,491.42 |
+| chunk | 1.11ms | ±322.36µs | 900.9 |
+| rollingWindow | 10.56ms | ±3.18ms | 94.7 |
 
 
 ## Bits Benchmarks
 
 | Benchmark | Mean | Margin | Operations/sec |
 |-----------|------|--------|---------------|
-| bitsToNumber-16 | 178.40ns | ±154.64ns | 5,605,381.17 |
-| bitsToNumber-32 | 189.80ns | ±240.07ns | 5,268,703.9 |
-| bitStringToNumber-16 | 208.10ns | ±137.20ns | 4,805,382.03 |
-| bitSubstring-medium | 263.00ns | ±1.19µs | 3,802,281.37 |
-| bitStringToNumber-32 | 294.70ns | ±180.56ns | 3,393,281.3 |
-| bitSubstring-large | 303.60ns | ±1.30µs | 3,293,807.64 |
-| bitsToNumber-53 | 313.40ns | ±1.47µs | 3,190,810.47 |
-| bitStringToNumber-53 | 415.40ns | ±588.44ns | 2,407,318.25 |
-| hexToPaddedBinary-small | 567.00ns | ±3.22µs | 1,763,668.43 |
-| hexToPaddedBinary-medium | 655.60ns | ±1.05µs | 1,525,320.32 |
-| bitSubstring-small | 663.10ns | ±10.28µs | 1,508,068.16 |
-| hexToPaddedBinary-large | 1.47µs | ±1.33µs | 680,272.11 |
+| bitsToNumber-16 | 188.60ns | ±220.93ns | 5,302,226.94 |
+| bitStringToNumber-16 | 231.10ns | ±203.18ns | 4,327,131.11 |
+| bitsToNumber-32 | 255.21ns | ±392.22ns | 3,918,341.76 |
+| bitsToNumber-53 | 275.50ns | ±359.80ns | 3,629,764.07 |
+| bitSubstring-small | 276.70ns | ±1.46µs | 3,614,022.41 |
+| hexToPaddedBinary-small | 331.91ns | ±521.74ns | 3,012,864.93 |
+| bitStringToNumber-32 | 371.01ns | ±271.99ns | 2,695,345.14 |
+| bitSubstring-large | 396.21ns | ±1.75µs | 2,523,914.09 |
+| bitStringToNumber-53 | 427.41ns | ±275.79ns | 2,339,673.85 |
+| bitSubstring-medium | 587.61ns | ±10.07µs | 1,701,809.02 |
+| hexToPaddedBinary-medium | 869.71ns | ±3.65µs | 1,149,808.56 |
+| hexToPaddedBinary-large | 2.41µs | ±15.81µs | 414,937.76 |
 
 
 ## String-view Benchmarks
 
 | Benchmark | Mean | Margin | Operations/sec |
 |-----------|------|--------|---------------|
-| cached-segmentation | 235.20ns | ±679.65ns | 4,251,700.68 |
-| create-large | 256.40ns | ±2.45µs | 3,900,156.01 |
-| chopInt-signed | 322.30ns | ±774.80ns | 3,102,699.35 |
-| create-small | 324.00ns | ±2.86µs | 3,086,419.75 |
-| chopLeft-ascii | 431.20ns | ±867.92ns | 2,319,109.46 |
-| chopFloat-signed | 489.60ns | ±3.19µs | 2,042,483.66 |
-| chopLeft-unicode | 573.20ns | ±4.39µs | 1,744,591.77 |
-| chopFloat-simple | 648.60ns | ±1.30µs | 1,541,782.3 |
-| chopInt-simple | 1.47µs | ±26.90µs | 680,272.11 |
-| trim-small | 2.02µs | ±24.06µs | 495,049.5 |
-| trim-large | 2.46µs | ±29.40µs | 406,504.07 |
-| parseFloat | 3.11µs | ±35.82µs | 321,543.41 |
-| parseInt | 3.29µs | ±11.77µs | 303,951.37 |
-| iterate-unicode | 5.27µs | ±3.25µs | 189,753.32 |
-| iterate-ascii | 5.99µs | ±35.67µs | 166,944.91 |
-| chopInt-mixed | 32.90µs | ±9.78µs | 30,395.14 |
-| complex-emoji-handling | 37.69µs | ±18.07µs | 26,532.24 |
-| chopFloat-mixed | 43.98µs | ±86.21µs | 22,737.61 |
-| charAt-ascii | 202.75µs | ±130.44µs | 4,932.18 |
-| charAt-unicode | 212.72µs | ±150.06µs | 4,701.02 |
+| create-small | 269.51ns | ±2.58µs | 3,710,437.46 |
+| create-large | 331.31ns | ±3.28µs | 3,018,321.21 |
+| chopLeft-unicode | 423.91ns | ±1.28µs | 2,358,991.3 |
+| chopFloat-simple | 559.80ns | ±3.53µs | 1,786,352.27 |
+| cached-segmentation | 563.41ns | ±9.61µs | 1,774,906.37 |
+| chopLeft-ascii | 609.31ns | ±2.28µs | 1,641,200.7 |
+| chopFloat-signed | 609.81ns | ±4.15µs | 1,639,855.04 |
+| trim-small | 744.51ns | ±1.35µs | 1,343,165.3 |
+| trim-large | 745.01ns | ±3.59µs | 1,342,263.86 |
+| chopInt-simple | 857.51ns | ±15.51µs | 1,166,167.16 |
+| chopInt-signed | 1.24µs | ±21.64µs | 806,451.61 |
+| parseFloat | 2.62µs | ±8.55µs | 381,679.39 |
+| parseInt | 5.06µs | ±60.60µs | 197,628.46 |
+| iterate-ascii | 5.44µs | ±5.74µs | 183,823.53 |
+| iterate-unicode | 6.82µs | ±3.45µs | 146,627.57 |
+| chopFloat-mixed | 38.43µs | ±20.61µs | 26,021.34 |
+| chopInt-mixed | 38.68µs | ±57.08µs | 25,853.15 |
+| complex-emoji-handling | 45.71µs | ±78.06µs | 21,877.05 |
+| charAt-ascii | 216.79µs | ±147.79µs | 4,612.76 |
+| charAt-unicode | 228.24µs | ±174.65µs | 4,381.35 |
 

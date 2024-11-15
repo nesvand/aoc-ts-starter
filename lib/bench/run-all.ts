@@ -82,13 +82,14 @@ function convertToNanos(value: number, unit: string): number {
 function formatTime(nanos: number): string {
     if (nanos < 1000) {
         return `${nanos.toFixed(2)}ns`;
-    } else if (nanos < 1_000_000) {
-        return `${(nanos / 1000).toFixed(2)}µs`;
-    } else if (nanos < 1_000_000_000) {
-        return `${(nanos / 1_000_000).toFixed(2)}ms`;
-    } else {
-        return `${(nanos / 1_000_000_000).toFixed(2)}s`;
     }
+    if (nanos < 1_000_000) {
+        return `${(nanos / 1000).toFixed(2)}µs`;
+    }
+    if (nanos < 1_000_000_000) {
+        return `${(nanos / 1_000_000).toFixed(2)}ms`;
+    }
+    return `${(nanos / 1_000_000_000).toFixed(2)}s`;
 }
 
 async function runAllBenchmarks(): Promise<void> {
