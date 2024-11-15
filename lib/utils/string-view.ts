@@ -74,7 +74,9 @@ export class StringView {
      */
     private getSegments(): Array<{ segment: string; index: number }> {
         if (!this.#segments) {
-            this.#segments = [...this.getSegmenter().segment(this.data)];
+            // Only create array once and cache it
+            const segmenter = this.getSegmenter();
+            this.#segments = Array.from(segmenter.segment(this.data));
         }
         return this.#segments;
     }
@@ -130,12 +132,15 @@ export class StringView {
      * @returns The character at the index, or empty string if out of bounds
      */
     public charAt(index: number): string {
-        const str = this.data;
-        if (index < 0 || index >= str.length) return '';
+        if (index < 0) return '';
 
-        const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
-        const segments = [...segmenter.segment(str)];
-        return segments[index]?.segment ?? '';
+        let currentIndex = 0;
+        for (const { segment } of this.getSegments()) {
+            if (currentIndex === index) return segment;
+            currentIndex++;
+            if (currentIndex > index) break;
+        }
+        return '';
     }
 
     /**
@@ -411,16 +416,10 @@ export class StringView {
      */
     public toInt(): number {
         const str = this.data;
-        const len = str.length;
-
-        // Pre-allocate buffer for digits
-        const digits = new Int8Array(len);
-        let digitCount = 0;
-
+        let result = 0;
         let sign = 1;
         let i = 0;
 
-        // Handle sign
         if (str[0] === '-') {
             sign = -1;
             i++;
@@ -428,20 +427,11 @@ export class StringView {
             i++;
         }
 
-        // Convert to digits first
-        for (; i < len; i++) {
+        for (; i < str.length; i++) {
             const char = str[i];
-            if (!char) throw new Error('Invalid character index when parsing integer');
+            if (!char) throw new Error('Unexpected end of string');
             if (!isDigit(char)) break;
-            digits[digitCount++] = char.charCodeAt(0) - 48; // '0' is 48 in ASCII
-        }
-
-        // Calculate result using TypedArray
-        let result = 0;
-        for (let j = 0; j < digitCount; j++) {
-            const digit = digits[j];
-            if (digit === undefined) throw new Error('Invalid digit index when parsing integer');
-            result = result * 10 + digit;
+            result = result * 10 + (char.charCodeAt(0) - 48);
         }
 
         return result * sign;
@@ -513,7 +503,7 @@ export class StringView {
      * @returns The current string view contents
      */
     get data(): string {
-        return this.#source.slice(this.#start, this.#start + this.#size);
+        return this.#source.substring(this.#start, this.#start + this.#size);
     }
 
     /**
@@ -702,11 +692,11 @@ export class StringView {
      * @returns A Result containing the parsed integer and updated StringView
      */
     public chopInt(): Result<number> {
+        let result = 0;
         let sign = 1;
         let i = 0;
         const str = this.data;
 
-        // Handle sign
         if (str[i] === '-') {
             sign = -1;
             i++;
@@ -714,25 +704,22 @@ export class StringView {
             i++;
         }
 
-        // Find where the number ends
-        let value = 0;
         let foundDigit = false;
-        while (i < str.length && isDigit(str[i])) {
-            value = value * 10 + (str.charCodeAt(i) - 48); // '0' is 48 in ASCII
+        for (; i < str.length; i++) {
+            const char = str[i];
+            if (!char) throw new Error('Unexpected end of string');
+            if (!isDigit(char)) break;
+            result = result * 10 + (char.charCodeAt(0) - 48);
             foundDigit = true;
-            i++;
         }
 
         if (!foundDigit) {
-            return { success: false };
+            return StringView.getResult(false);
         }
 
-        // Update the view
-        const result = value * sign;
         this.#start += i;
         this.#size -= i;
-        this.invalidateCache();
-        return { success: true, data: result };
+        return StringView.getResult(true, result * sign);
     }
 
     /**
@@ -775,14 +762,14 @@ export class StringView {
         }
 
         if (!foundDigit) {
-            return { success: false };
+            return StringView.getResult(false);
         }
 
         // Update the view
         const result = sign * (intPart + fracPart / fracDiv);
         this.#start += i;
         this.#size -= i;
-        return { success: true, data: result };
+        return StringView.getResult(true, result);
     }
 
     /**
@@ -801,5 +788,27 @@ export class StringView {
         this.#segments = undefined;
         this.#lengthInGraphemes = undefined;
         this.#trimmedIndices = undefined;
+    }
+
+    public dispose(): void {
+        this.#segments = undefined;
+        this.#segmenter = undefined;
+        this.#lengthInGraphemes = undefined;
+        this.#trimmedIndices = undefined;
+    }
+
+    // And a static cleanup method
+    public static cleanup(): void {
+        StringView.resultPool.length = 0;
+    }
+
+    // Add static result pool
+    private static resultPool: Result<unknown>[] = [];
+
+    private static getResult<T>(success: boolean, data?: T): Result<T> {
+        const result = StringView.resultPool.pop() || { success: false, data: undefined };
+        result.success = success;
+        result.data = data;
+        return result as Result<T>;
     }
 }
