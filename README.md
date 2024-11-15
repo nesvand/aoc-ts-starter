@@ -4,6 +4,45 @@ A template for [Advent of Code](https://adventofcode.com) written in Typescript 
 
 (Adapted from https://github.com/ljgago - repo not available)
 
+## Features
+
+### Core Functionality
+- Automatic file generation for each day's challenge
+- Automatic input download from Advent of Code
+- Test-driven development setup
+- Bun runtime for fast execution
+
+### Enhanced String Processing
+The project includes a robust `StringView` class for efficient string manipulation:
+
+- **Unicode Support**
+  - Full Unicode character handling including emojis and combining characters
+  - Proper grapheme cluster handling for complex emoji sequences
+  - CJK character support
+  - Unicode whitespace handling
+
+- **String Operations**
+  - Efficient substring operations without allocation
+  - Delimiter-based string splitting (including multi-character delimiters)
+  - Comprehensive whitespace trimming
+  - Case-insensitive comparisons
+
+- **Number Parsing**
+  - Integer parsing with sign handling
+  - Floating-point parsing with proper precision
+  - Robust error handling for malformed inputs
+
+### Benchmarking
+Built-in benchmarking utilities for performance testing:
+```bash
+bun run lib/utils/array.bench.ts <function-name> [options]
+```
+
+Options:
+  -w, --warmup  Number of warmup iterations       [number] [default: 0]
+  -r, --runs    Number of benchmark runs          [number] [default: 1000]
+  -h, --help    Show help                         [boolean]
+
 ## Usage
 
 The project uses [Bun](https://bun.sh) for the javascript runtime, package manager, and for testing.
@@ -38,14 +77,6 @@ This command generates these files:
     * creating src/day01/README.md
     * creating test/day01.test.spec.ts
 
--   `/src/day01/resources/input.txt`: the input data.
--   `/src/day01/index.ts`: export the modules for testing.
--   `/src/day01/main.ts`: the main module.
--   `/src/day01/part1.ts`: solution for part 1.
--   `/src/day01/part2.ts`: solution for part 2.
--   `/src/day01/README.md`: you can write the challenge statement.
--   `/tests/day01.test.spec.ts`: the module where you write the tests.
-
 ## Config
 
 You can configure the automatic input download from Advent of Code by using your session token.
@@ -59,75 +90,10 @@ Also can you set the `AOC_YEAR` to select a certain year.
 
 You can set an `.env` file with these variables.
 
-Folder structure:
-
-    ├── src
-    │   └── day01
-    │       ├── index.ts
-    │       ├── main.ts
-    │       ├── part1.ts
-    │       ├── part2.ts
-    │       ├── README.md
-    │       └── resources
-    │           └── input.txt
-    └── test
-        └── day01.test.spec.ts
-
-Happy coding!
-
-## Benchmarking
-
-The project includes a benchmarking utility to measure the performance of your solutions. You can benchmark specific functions using:
-
-```bash
-bun run lib/utils/array.bench.ts <function-name> [options]
-```
-
-```
-Options:
-  -w, --warmup  Number of warmup iterations       [number] [default: 0]
-  -r, --runs    Number of benchmark runs          [number] [default: 1000]
-  -h, --help    Show help                         [boolean]
-```
-
-Example:
-```bash
-# Run 'max' function benchmark with 100 warmup iterations and 1000 runs
-bun run lib/utils/array.bench.ts max -w 100 -r 1000
-
-# Show help and available options
-bun run lib/utils/array.bench.ts --help
-```
-
-To create benchmarks for your own functions:
-1. Create a new benchmark file (e.g., `myutils.bench.ts`)
-2. Import the benchmark utilities:
-```typescript
-import { type TestCase, runBenchmark, parseArgs } from "./bench";
-```
-3. Define your test cases:
-```typescript
-const testCases: TestCase[] = [
-    {
-        name: "myFunction",
-        fn: myFunction,
-        setup: () => yourTestData,
-    },
-];
-```
-4. Run the benchmark:
-```typescript
-const { functionName, options } = parseArgs(process.argv);
-runBenchmark(functionName, testCases, options);
-```
-
-The benchmark will display a progress bar during execution and output statistics including:
-- Mean execution time with standard deviation
-- Min/max execution times
-- Number of runs and warmup iterations
-
 ## Additional Credits
 
-`StringView` is adapted from [sv](https://github.com/tsoding/sv) by [Alexey Kutepov](https://github.com/tsoding).
+- Original template by [ljgago](https://github.com/ljgago)
+- `StringView` is adapted from [sv](https://github.com/tsoding/sv) by [Alexey Kutepov](https://github.com/tsoding)
+- Enhanced with full Unicode support and additional string processing capabilities
 
 [MIT License](LICENSE)
