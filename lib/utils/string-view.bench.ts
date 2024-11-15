@@ -24,6 +24,10 @@ const testData = {
     
     // Complex emoji sequences
     complexEmoji: "👨‍👩‍👧‍👦 👨🏻‍💻 🏳️‍🌈",
+
+    // Number chopping
+    mixedIntegers: "123 -456 +789 abc 101112",
+    mixedFloats: "123.456 -789.012 +345.678 abc 901.234",
 };
 
 const testCases: TestCase[] = [
@@ -127,6 +131,58 @@ const testCases: TestCase[] = [
             }
         },
         setup: () => new StringView(testData.mediumMixed),
+    },
+
+    // Number chopping operations
+    {
+        name: "chopInt-simple",
+        fn: (sv: StringView) => sv.chopInt(),
+        setup: () => new StringView("12345"),
+    },
+    {
+        name: "chopInt-signed",
+        fn: (sv: StringView) => sv.chopInt(),
+        setup: () => new StringView("-12345"),
+    },
+    {
+        name: "chopInt-mixed",
+        fn: (sv: StringView) => {
+            const view = new StringView(testData.mixedIntegers);
+            const results = [];
+            let result = view.chopInt();
+            while (result.success) {
+                results.push(result.data);
+                view.trimLeft(); // Skip any whitespace
+                result = view.chopInt();
+            }
+            return results;
+        },
+        setup: () => null, // Setup is handled in fn
+    },
+    {
+        name: "chopFloat-simple",
+        fn: (sv: StringView) => sv.chopFloat(),
+        setup: () => new StringView("123.456"),
+    },
+    {
+        name: "chopFloat-signed",
+        fn: (sv: StringView) => sv.chopFloat(),
+        setup: () => new StringView("-123.456"),
+    },
+    {
+        name: "chopFloat-mixed",
+        fn: (sv: StringView) => {
+            const view = new StringView(testData.mixedFloats);
+            const results = [];
+            let result = view.chopFloat();
+            while (result.success) {
+                results.push(result.data);
+                view.trimLeft(); // Skip any whitespace
+                result = view.chopFloat();
+            }
+            return results;
+        },
+        setup: () => null, // Setup is handled in fn
     },
 ];
 

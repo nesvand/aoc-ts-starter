@@ -1,7 +1,11 @@
 import { StringView, isWhitespace } from '@lib/utils/string-view';
 
 export function int() {
-    return (sv: StringView) => sv.chopInt();
+    return (sv: StringView) => {
+        const result = sv.chopInt();
+        if (!result.success) throw new Error('Failed to parse integer');
+        return result.data;
+    };
 }
 
 export function word() {
@@ -12,7 +16,11 @@ export function word() {
 }
 
 export function float() {
-    return (sv: StringView) => sv.chopFloat();
+    return (sv: StringView) => {
+        const result = sv.chopFloat();
+        if (!result.success) throw new Error('Failed to parse float');
+        return result.data;
+    };
 }
 
 export function optional() {

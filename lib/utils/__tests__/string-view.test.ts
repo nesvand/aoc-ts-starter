@@ -212,6 +212,154 @@ describe('@lib/utils/string-view', () => {
                 expect(str.charAt(1)).toBe('');
             });
         });
+
+        describe('number chopping', () => {
+            describe('chopInt', () => {
+                test('basic integer chopping', () => {
+                    const sv = new StringView('123abc');
+                    const result = sv.chopInt();
+                    expect(result.success).toBe(true);
+                    expect(result.data).toBe(123);
+                    expect(sv.toString()).toBe('abc');
+                });
+
+                test('signed integers', () => {
+                    const sv1 = new StringView('-123abc');
+                    const result1 = sv1.chopInt();
+                    expect(result1.success).toBe(true);
+                    expect(result1.data).toBe(-123);
+                    expect(sv1.toString()).toBe('abc');
+
+                    const sv2 = new StringView('+456def');
+                    const result2 = sv2.chopInt();
+                    expect(result2.success).toBe(true);
+                    expect(result2.data).toBe(456);
+                    expect(sv2.toString()).toBe('def');
+                });
+
+                test('invalid integers', () => {
+                    const cases = [
+                        '',           // empty string
+                        'abc',        // no digits
+                        '-abc',       // sign only
+                        '+abc',       // sign only
+                        '+-123',      // invalid sign
+                        '--123',      // multiple signs
+                        '++123',      // multiple signs
+                    ];
+
+                    for (const testCase of cases) {
+                        const sv = new StringView(testCase);
+                        const result = sv.chopInt();
+                        expect(result.success).toBe(false);
+                        expect(result.data).toBeUndefined();
+                        expect(sv.toString()).toBe(testCase);
+                    }
+                });
+
+                test('sequential integer chopping', () => {
+                    const sv = new StringView('123 456 789');
+                    
+                    const result1 = sv.chopInt();
+                    expect(result1.success).toBe(true);
+                    expect(result1.data).toBe(123);
+                    sv.trimLeft();
+
+                    const result2 = sv.chopInt();
+                    expect(result2.success).toBe(true);
+                    expect(result2.data).toBe(456);
+                    sv.trimLeft();
+
+                    const result3 = sv.chopInt();
+                    expect(result3.success).toBe(true);
+                    expect(result3.data).toBe(789);
+                    expect(sv.toString()).toBe('');
+                });
+            });
+
+            describe('chopFloat', () => {
+                test('basic float chopping', () => {
+                    const sv = new StringView('123.456abc');
+                    const result = sv.chopFloat();
+                    expect(result.success).toBe(true);
+                    expect(result.data).toBeCloseTo(123.456);
+                    expect(sv.toString()).toBe('abc');
+                });
+
+                test('signed floats', () => {
+                    const sv1 = new StringView('-123.456abc');
+                    const result1 = sv1.chopFloat();
+                    expect(result1.success).toBe(true);
+                    expect(result1.data).toBeCloseTo(-123.456);
+                    expect(sv1.toString()).toBe('abc');
+
+                    const sv2 = new StringView('+456.789def');
+                    const result2 = sv2.chopFloat();
+                    expect(result2.success).toBe(true);
+                    expect(result2.data).toBeCloseTo(456.789);
+                    expect(sv2.toString()).toBe('def');
+                });
+
+                test('partial floats', () => {
+                    const cases = [
+                        { input: '123.', expected: 123 },
+                        { input: '.456', expected: 0.456 },
+                        { input: '+.456', expected: 0.456 },
+                        { input: '-.456', expected: -0.456 },
+                        { input: '123.abc', expected: 123 },
+                    ];
+
+                    for (const { input, expected } of cases) {
+                        const sv = new StringView(input);
+                        const result = sv.chopFloat();
+                        expect(result.success).toBe(true);
+                        expect(result.data).toBeCloseTo(expected);
+                    }
+                });
+
+                test('invalid floats', () => {
+                    const cases = [
+                        '',           // empty string
+                        'abc',        // no digits
+                        '-abc',       // sign only
+                        '+abc',       // sign only
+                        '+-123.456',  // invalid sign
+                        '--123.456',  // multiple signs
+                        '++123.456',  // multiple signs
+                        '.',          // decimal point only
+                        '+.',         // sign and decimal only
+                        '-.',         // sign and decimal only
+                    ];
+
+                    for (const testCase of cases) {
+                        const sv = new StringView(testCase);
+                        const result = sv.chopFloat();
+                        expect(result.success).toBe(false);
+                        expect(result.data).toBeUndefined();
+                        expect(sv.toString()).toBe(testCase);
+                    }
+                });
+
+                test('sequential float chopping', () => {
+                    const sv = new StringView('123.45 -456.78 +789.01');
+                    
+                    const result1 = sv.chopFloat();
+                    expect(result1.success).toBe(true);
+                    expect(result1.data).toBeCloseTo(123.45);
+                    sv.trimLeft();
+
+                    const result2 = sv.chopFloat();
+                    expect(result2.success).toBe(true);
+                    expect(result2.data).toBeCloseTo(-456.78);
+                    sv.trimLeft();
+
+                    const result3 = sv.chopFloat();
+                    expect(result3.success).toBe(true);
+                    expect(result3.data).toBeCloseTo(789.01);
+                    expect(sv.toString()).toBe('');
+                });
+            });
+        });
     });
 
     describe('utility functions', () => {

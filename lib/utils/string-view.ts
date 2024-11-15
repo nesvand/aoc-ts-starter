@@ -186,10 +186,22 @@ export class StringView {
      * @returns A new StringView with leading whitespace removed
      */
     public trimLeft(): StringView {
-        const trimCount = [...this.data].findIndex((char) => !isWhitespace(char));
-        return trimCount === -1
-            ? StringView.fromParts(this.#source, this.#start + this.#size, 0)
-            : StringView.fromParts(this.#source, this.#start + trimCount, this.#size - trimCount);
+        const segments = this.getSegments();
+        let i = 0;
+        while (i < segments.length && isWhitespace(segments[i]?.segment)) {
+            i++;
+        }
+        const segment = segments[i];
+        if (!segment) {
+            this.#start += this.#size;
+            this.#size = 0;
+        } else {
+            const offset = segment.index;
+            this.#start += offset;
+            this.#size -= offset;
+        }
+        this.invalidateCache();
+        return this;
     }
 
     /**
@@ -682,6 +694,94 @@ export class StringView {
             this.#trimmedIndices = { start, end };
         }
         return this.#trimmedIndices;
+    }
+
+    /**
+     * Chops off and returns an integer from the start of the string
+     * @returns A Result containing the parsed integer and updated StringView
+     */
+    public chopInt(): Result<number> {
+        let sign = 1;
+        let i = 0;
+        const str = this.data;
+
+        // Handle sign
+        if (str[i] === '-') {
+            sign = -1;
+            i++;
+        } else if (str[i] === '+') {
+            i++;
+        }
+
+        // Find where the number ends
+        let value = 0;
+        let foundDigit = false;
+        while (i < str.length && isDigit(str[i])) {
+            value = value * 10 + (str.charCodeAt(i) - 48); // '0' is 48 in ASCII
+            foundDigit = true;
+            i++;
+        }
+
+        if (!foundDigit) {
+            return { success: false };
+        }
+
+        // Update the view
+        const result = value * sign;
+        this.#start += i;
+        this.#size -= i;
+        this.invalidateCache();
+        return { success: true, data: result };
+    }
+
+    /**
+     * Chops off and returns a float from the start of the string
+     * @returns A Result containing the parsed float and updated StringView
+     */
+    public chopFloat(): Result<number> {
+        let sign = 1;
+        let i = 0;
+        const str = this.data;
+
+        // Handle sign
+        if (str[i] === '-') {
+            sign = -1;
+            i++;
+        } else if (str[i] === '+') {
+            i++;
+        }
+
+        // Parse integer part
+        let intPart = 0;
+        let foundDigit = false;
+        while (i < str.length && isDigit(str[i])) {
+            intPart = intPart * 10 + (str.charCodeAt(i) - 48);
+            foundDigit = true;
+            i++;
+        }
+
+        // Parse decimal part
+        let fracPart = 0;
+        let fracDiv = 1;
+        if (i < str.length && str[i] === '.') {
+            i++;
+            while (i < str.length && isDigit(str[i])) {
+                fracPart = fracPart * 10 + (str.charCodeAt(i) - 48);
+                fracDiv *= 10;
+                foundDigit = true;
+                i++;
+            }
+        }
+
+        if (!foundDigit) {
+            return { success: false };
+        }
+
+        // Update the view
+        const result = sign * (intPart + fracPart / fracDiv);
+        this.#start += i;
+        this.#size -= i;
+        return { success: true, data: result };
     }
 }
 
