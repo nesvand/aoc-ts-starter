@@ -46,6 +46,7 @@ export class BinaryHeap<T> {
         }
 
         // Move last element to root and sift down
+        // biome-ignore lint/style/noNonNullAssertion: We know the heap is not empty
         const last = this.heap.pop()!;
         this.heap[0] = last;
         this.siftDown(0);
@@ -83,11 +84,18 @@ export class BinaryHeap<T> {
 
     private siftUp(index: number): void {
         const value = this.heap[index];
+        if (value === undefined) {
+            throw new Error('Value is undefined');
+        }
+
         let currentIndex = index;
 
         while (currentIndex > 0) {
             const parentIndex = Math.floor((currentIndex - 1) / 2);
             const parent = this.heap[parentIndex];
+            if (parent === undefined) {
+                throw new Error('Parent is undefined');
+            }
 
             if (this.compare(value, parent) <= 0) {
                 break;
@@ -102,6 +110,10 @@ export class BinaryHeap<T> {
     private siftDown(index: number): void {
         const size = this.heap.length;
         const value = this.heap[index];
+        if (value === undefined) {
+            throw new Error('Value is undefined');
+        }
+
         let currentIndex = index;
 
         while (true) {
@@ -111,14 +123,32 @@ export class BinaryHeap<T> {
 
             if (leftChildIndex < size) {
                 const leftChild = this.heap[leftChildIndex];
-                if (this.compare(leftChild, this.heap[maxIndex]) > 0) {
+                if (leftChild === undefined) {
+                    throw new Error('Left child is undefined');
+                }
+
+                const maxChild = this.heap[maxIndex];
+                if (maxChild === undefined) {
+                    throw new Error('Max child is undefined');
+                }
+
+                if (this.compare(leftChild, maxChild) > 0) {
                     maxIndex = leftChildIndex;
                 }
             }
 
             if (rightChildIndex < size) {
                 const rightChild = this.heap[rightChildIndex];
-                if (this.compare(rightChild, this.heap[maxIndex]) > 0) {
+                if (rightChild === undefined) {
+                    throw new Error('Right child is undefined');
+                }
+
+                const maxChild = this.heap[maxIndex];
+                if (maxChild === undefined) {
+                    throw new Error('Max child is undefined');
+                }
+
+                if (this.compare(rightChild, maxChild) > 0) {
                     maxIndex = rightChildIndex;
                 }
             }
@@ -127,14 +157,16 @@ export class BinaryHeap<T> {
                 break;
             }
 
-            this.heap[currentIndex] = this.heap[maxIndex];
+            // biome-ignore lint/style/noNonNullAssertion: We know the heap is not empty
+            this.heap[currentIndex] = this.heap[maxIndex]!;
             this.heap[maxIndex] = value;
             currentIndex = maxIndex;
         }
     }
 
     private swap(i: number, j: number): void {
-        [this.heap[i], this.heap[j]] = [this.heap[j], this.heap[i]];
+        // biome-ignore lint/style/noNonNullAssertion: (unsafe) not currently in use
+        [this.heap[i], this.heap[j]] = [this.heap[j]!, this.heap[i]!];
     }
 
     public get(index: number): T | undefined {
@@ -147,6 +179,10 @@ export class BinaryHeap<T> {
         }
 
         const oldValue = this.heap[index];
+        if (oldValue === undefined) {
+            throw new Error('Old value is undefined');
+        }
+
         this.heap[index] = value;
 
         const comparison = this.compare(value, oldValue);
