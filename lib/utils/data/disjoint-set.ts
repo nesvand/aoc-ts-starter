@@ -62,6 +62,9 @@ export class DisjointSet {
             throw new Error('Element out of bounds');
         }
         if (this.parent[x] !== x) {
+            if (this.parent[x] === undefined) {
+                throw new Error('Parent is undefined');
+            }
             this.parent[x] = this.find(this.parent[x]); // Path compression
         }
         return this.parent[x];
@@ -93,6 +96,9 @@ export class DisjointSet {
         }
 
         // Union by rank
+        if (this.rank[rootX] === undefined || this.rank[rootY] === undefined) {
+            throw new Error('Rank is undefined');
+        }
         if (this.rank[rootX] < this.rank[rootY]) {
             this.parent[rootX] = rootY;
         } else if (this.rank[rootX] > this.rank[rootY]) {
