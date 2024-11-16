@@ -811,4 +811,32 @@ export class StringView {
         result.data = data;
         return result as Result<T>;
     }
+
+    /**
+     * Protected method to get internal state
+     * @internal
+     */
+    protected getInternalState(): { source: string; start: number; size: number } {
+        return {
+            source: this.#source,
+            start: this.#start,
+            size: this.#size,
+        };
+    }
+
+    /**
+     * Copies state from another StringView instance
+     * @param other - The StringView to copy from
+     */
+    public copyFrom(other: StringView): void {
+        const state = other.getInternalState();
+        this.#source = state.source;
+        this.#start = state.start;
+        this.#size = state.size;
+        // Reset all caches since we're changing the view
+        this.#segmenter = undefined;
+        this.#segments = undefined;
+        this.#lengthInGraphemes = undefined;
+        this.#trimmedIndices = undefined;
+    }
 }

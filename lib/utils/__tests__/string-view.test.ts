@@ -413,6 +413,101 @@ describe('@lib/utils/string-view', () => {
                 expect(sv.toString()).toBe('abc');
             });
         });
+
+        describe('copyFrom', () => {
+            test('should copy state from another StringView', () => {
+                const source = new StringView('test string');
+                source.chopLeft(5); // chops 'test '
+
+                const target = new StringView('different content');
+                target.copyFrom(source);
+
+                expect(target.toString()).toBe('string');
+                expect(target.start).toBe(source.start);
+                expect(target.size).toBe(source.size);
+                expect(target.source).toBe(source.source);
+            });
+
+            test('should maintain independence after copy', () => {
+                const source = new StringView('test string');
+                const target = new StringView('different');
+
+                target.copyFrom(source);
+                source.chopLeft(5);
+
+                expect(source.toString()).toBe('string');
+                expect(target.toString()).toBe('test string');
+            });
+
+            test('should handle copying from empty StringView', () => {
+                const source = new StringView('');
+                const target = new StringView('test');
+
+                target.copyFrom(source);
+
+                expect(target.toString()).toBe('');
+                expect(target.size).toBe(0);
+            });
+
+            test('should preserve functionality after copy', () => {
+                const source = new StringView('123.456 test');
+                source.chopFloat(); // moves past the number
+                source.trimLeft(); // removes the space
+
+                const target = new StringView('different');
+                target.copyFrom(source);
+
+                expect(target.toString()).toBe('test');
+
+                // Should still be able to use normal StringView operations
+                expect(target.trimLeft().toString()).toBe('test');
+                expect(target.chopLeft(2).toString()).toBe('te');
+            });
+        });
+
+        describe('internal state', () => {
+            test('should expose correct internal state', () => {
+                const sv = new StringView('test string');
+                const initialState = (sv as any).getInternalState();
+
+                expect(initialState).toEqual({
+                    source: 'test string',
+                    start: 0,
+                    size: 11,
+                });
+
+                // Modify the view
+                sv.chopLeft(5); // chops 'test '
+                const modifiedState = (sv as any).getInternalState();
+
+                expect(modifiedState).toEqual({
+                    source: 'test string',
+                    start: 5,
+                    size: 6,
+                });
+            });
+
+            test('should maintain correct state after operations', () => {
+                const sv = new StringView('123.456 test');
+                const initialState = (sv as any).getInternalState();
+
+                expect(initialState).toEqual({
+                    source: '123.456 test',
+                    start: 0,
+                    size: 12,
+                });
+
+                sv.chopFloat(); // moves past the number
+                sv.trimLeft(); // removes the space
+
+                const finalState = (sv as any).getInternalState();
+                expect(finalState).toEqual({
+                    source: '123.456 test',
+                    start: 8,
+                    size: 4,
+                });
+            });
+        });
     });
 
     describe('utility functions', () => {
