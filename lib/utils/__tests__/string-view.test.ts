@@ -468,6 +468,7 @@ describe('@lib/utils/string-view', () => {
         describe('internal state', () => {
             test('should expose correct internal state', () => {
                 const sv = new StringView('test string');
+                // biome-ignore lint/suspicious/noExplicitAny: Accessing internal state for testing
                 const initialState = (sv as any).getInternalState();
 
                 expect(initialState).toEqual({
@@ -478,6 +479,7 @@ describe('@lib/utils/string-view', () => {
 
                 // Modify the view
                 sv.chopLeft(5); // chops 'test '
+                // biome-ignore lint/suspicious/noExplicitAny: Accessing internal state for testing
                 const modifiedState = (sv as any).getInternalState();
 
                 expect(modifiedState).toEqual({
@@ -489,6 +491,7 @@ describe('@lib/utils/string-view', () => {
 
             test('should maintain correct state after operations', () => {
                 const sv = new StringView('123.456 test');
+                // biome-ignore lint/suspicious/noExplicitAny: Accessing internal state for testing
                 const initialState = (sv as any).getInternalState();
 
                 expect(initialState).toEqual({
@@ -500,6 +503,7 @@ describe('@lib/utils/string-view', () => {
                 sv.chopFloat(); // moves past the number
                 sv.trimLeft(); // removes the space
 
+                // biome-ignore lint/suspicious/noExplicitAny: Accessing internal state for testing
                 const finalState = (sv as any).getInternalState();
                 expect(finalState).toEqual({
                     source: '123.456 test',
