@@ -1,5 +1,5 @@
-import { writeFileSync } from 'node:fs';
 import { spawn } from 'node:child_process';
+import { writeFileSync } from 'node:fs';
 import { ArrayBenchmarks, BitsBenchmarks, StringViewBenchmarks } from './types';
 
 interface BenchmarkResult {

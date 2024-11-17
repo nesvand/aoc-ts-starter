@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import {
+    RollingWindowIterator,
     asNumbers,
     chunk,
     from,
@@ -15,7 +16,6 @@ import {
     splitOn,
     sum,
     zip,
-    RollingWindowIterator,
 } from '@lib/array';
 
 describe('@lib/utils/array', () => {
