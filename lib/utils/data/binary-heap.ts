@@ -87,17 +87,16 @@ export class BinaryHeap<T extends PositionTrackable> {
     }
 
     private siftUp(index: number): void {
+        let currentIndex = index;
         const value = this.heap[index];
-        if (value === undefined) {
+        if (!value) {
             throw new Error('Value is undefined');
         }
-
-        let currentIndex = index;
 
         while (currentIndex > 0) {
             const parentIndex = Math.floor((currentIndex - 1) / 2);
             const parent = this.heap[parentIndex];
-            if (parent === undefined) {
+            if (!parent) {
                 throw new Error('Parent is undefined');
             }
 
@@ -105,20 +104,18 @@ export class BinaryHeap<T extends PositionTrackable> {
                 break;
             }
 
-            this.heap[currentIndex] = parent;
-            this.heap[parentIndex] = value;
+            this.swap(currentIndex, parentIndex);
             currentIndex = parentIndex;
         }
     }
 
     private siftDown(index: number): void {
         const size = this.heap.length;
+        let currentIndex = index;
         const value = this.heap[index];
-        if (value === undefined) {
+        if (!value) {
             throw new Error('Value is undefined');
         }
-
-        let currentIndex = index;
 
         while (true) {
             const leftChildIndex = 2 * currentIndex + 1;
@@ -127,32 +124,27 @@ export class BinaryHeap<T extends PositionTrackable> {
 
             if (leftChildIndex < size) {
                 const leftChild = this.heap[leftChildIndex];
-                if (leftChild === undefined) {
+                if (!leftChild) {
                     throw new Error('Left child is undefined');
                 }
 
-                const maxChild = this.heap[maxIndex];
-                if (maxChild === undefined) {
-                    throw new Error('Max child is undefined');
-                }
-
-                if (this.compare(leftChild, maxChild) > 0) {
+                if (this.compare(leftChild, value) > 0) {
                     maxIndex = leftChildIndex;
                 }
             }
 
             if (rightChildIndex < size) {
                 const rightChild = this.heap[rightChildIndex];
-                if (rightChild === undefined) {
+                if (!rightChild) {
                     throw new Error('Right child is undefined');
                 }
 
-                const maxChild = this.heap[maxIndex];
-                if (maxChild === undefined) {
-                    throw new Error('Max child is undefined');
+                const maxValue = maxIndex === currentIndex ? value : this.heap[maxIndex];
+                if (!maxValue) {
+                    throw new Error('Max value is undefined');
                 }
 
-                if (this.compare(rightChild, maxChild) > 0) {
+                if (this.compare(rightChild, maxValue) > 0) {
                     maxIndex = rightChildIndex;
                 }
             }
@@ -161,9 +153,7 @@ export class BinaryHeap<T extends PositionTrackable> {
                 break;
             }
 
-            // biome-ignore lint/style/noNonNullAssertion: We know the heap is not empty
-            this.heap[currentIndex] = this.heap[maxIndex]!;
-            this.heap[maxIndex] = value;
+            this.swap(currentIndex, maxIndex);
             currentIndex = maxIndex;
         }
     }
@@ -183,8 +173,8 @@ export class BinaryHeap<T extends PositionTrackable> {
         this.heap[j] = temp;
 
         // Notify both items of their new positions
-        if (this.heap[i]) this.notifyPosition(this.heap[i], i);
-        if (this.heap[j]) this.notifyPosition(this.heap[j], j);
+        if (this.heap[i].onPositionChange) this.heap[i].onPositionChange(i);
+        if (this.heap[j].onPositionChange) this.heap[j].onPositionChange(j);
     }
 
     public get(index: number): T | undefined {
