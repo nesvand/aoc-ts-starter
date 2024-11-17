@@ -2,7 +2,11 @@
  * A Binary Heap implementation that can be used as either min-heap or max-heap.
  * @template T The type of elements stored in the heap
  */
-export class BinaryHeap<T> {
+interface PositionTrackable {
+    onPositionChange?: (position: number) => void;
+}
+
+export class BinaryHeap<T extends PositionTrackable> {
     private heap: T[];
     private compare: (a: T, b: T) => number;
 
@@ -165,8 +169,22 @@ export class BinaryHeap<T> {
     }
 
     private swap(i: number, j: number): void {
-        // biome-ignore lint/style/noNonNullAssertion: (unsafe) not currently in use
-        [this.heap[i], this.heap[j]] = [this.heap[j]!, this.heap[i]!];
+        const temp = this.heap[i];
+        if (temp === undefined) {
+            throw new Error('Temp is undefined');
+        }
+
+        const temp2 = this.heap[j];
+        if (temp2 === undefined) {
+            throw new Error('Temp2 is undefined');
+        }
+
+        this.heap[i] = temp2;
+        this.heap[j] = temp;
+
+        // Notify both items of their new positions
+        if (this.heap[i]) this.notifyPosition(this.heap[i], i);
+        if (this.heap[j]) this.notifyPosition(this.heap[j], j);
     }
 
     public get(index: number): T | undefined {
@@ -192,5 +210,9 @@ export class BinaryHeap<T> {
         } else {
             this.siftDown(index);
         }
+    }
+
+    private notifyPosition(item: T, position: number): void {
+        item.onPositionChange?.(position);
     }
 }

@@ -14,13 +14,16 @@ export class PriorityQueue<T, P = number> {
     constructor(
         comparator: (a: P, b: P) => number = (a: P, b: P) => {
             if (typeof a === 'number' && typeof b === 'number') {
-                return b - a;
+                return a - b;
             }
             throw new Error('Custom comparator required for non-number priorities');
         },
     ) {
         this.positions = new Map();
-        this.heap = new BinaryHeap<{ item: T; priority: P }>((a, b) => comparator(a.priority, b.priority));
+        this.heap = new BinaryHeap<{ item: T; priority: P }>((a, b) => {
+            const result = comparator(a.priority, b.priority);
+            return result;
+        });
     }
 
     public enqueue(item: T, priority: P): void {
@@ -28,7 +31,15 @@ export class PriorityQueue<T, P = number> {
             throw new Error('Item already exists in queue');
         }
 
-        const index = this.heap.push({ item, priority });
+        const wrapper = {
+            item,
+            priority,
+            onPositionChange: (newPos: number) => {
+                this.positions.set(item, newPos);
+            },
+        };
+
+        const index = this.heap.push(wrapper);
         this.positions.set(item, index);
     }
 
@@ -53,7 +64,13 @@ export class PriorityQueue<T, P = number> {
             throw new Error('Heap is corrupted');
         }
 
-        this.heap.update(position, { item, priority: newPriority });
+        this.heap.update(position, {
+            item,
+            priority: newPriority,
+            onPositionChange: (newPos: number) => {
+                this.positions.set(item, newPos);
+            },
+        });
     }
 
     public peek(): T {
