@@ -147,8 +147,13 @@ const DayArgumentValidator = /(?<=day)\d+(?!\w)/;
 
         // create and render the template files
         for (const [templatePath, targetPath] of templateTargets(dayName)) {
-            pipeAsync(readTemplate, renderTemplate(data), createFile(targetPath))(templatePath);
+            await pipeAsync(readTemplate, renderTemplate(data), createFile(targetPath))(templatePath);
         }
+
+        console.log(`\n${chalk.green('done!')} ${dayName} created!`);
+        console.log(
+            `\n${chalk.bold(chalk.yellow(`Visit https://adventofcode.com/${year}/day/${dayNumber} for the puzzle details`))}`,
+        );
     } catch (err) {
         console.error(err);
     }
