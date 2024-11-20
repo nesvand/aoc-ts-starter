@@ -17,6 +17,6 @@ jobs:
         uses: dorny/test-reporter@v1
         with:
           artifact: test-results
-          name: Bun Tests
+          name: Build and Test Report
           path: '*.xml'
           reporter: jest-junit
