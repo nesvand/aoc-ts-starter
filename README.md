@@ -1,6 +1,6 @@
 # Advent of Code Typescript Starter
 
-[![CI](https://github.com/{username}/{repo}/actions/workflows/ci.yml/badge.svg)](https://github.com/{username}/{repo}/actions/workflows/ci.yml)
+[![CI](https://github.com/nesvand/aoc-ts-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/nesvand/aoc-ts-starter/actions/workflows/ci.yml)
 
 A template for [Advent of Code](https://adventofcode.com) written in Typescript with Node.
 
