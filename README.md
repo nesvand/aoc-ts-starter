@@ -1,5 +1,7 @@
 # Advent of Code Typescript Starter
 
+[![CI](https://github.com/{username}/{repo}/actions/workflows/ci.yml/badge.svg)](https://github.com/{username}/{repo}/actions/workflows/ci.yml)
+
 A template for [Advent of Code](https://adventofcode.com) written in Typescript with Node.
 
 (Adapted from https://github.com/ljgago - repo not available)
