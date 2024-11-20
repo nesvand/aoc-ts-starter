@@ -1,0 +1,43 @@
+name: Release
+on:
+  release:
+    types: [created]
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Important for getting git history
+      
+      - name: Update package.json version
+        uses: erlete/version-updater@v2.0
+        with:
+          target-file: package.json
+          commit-title: "Bump version"
+          commit-description: "Updates package.json version to match {version}"
+      
+      - name: Generate Release Notes
+        id: release_notes
+        run: |
+          # Get the previous tag
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          
+          if [ -z "$PREV_TAG" ]; then
+            # If no previous tag, get all commits
+            COMMITS=$(git log --pretty=format:"- %s" --no-merges)
+          else
+            # Get commits between tags
+            COMMITS=$(git log --pretty=format:"- %s" --no-merges ${PREV_TAG}..HEAD)
+          fi
+          
+          # Save commits to release notes
+          echo "$COMMITS" > release_notes.md
+          
+      - name: Update Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: release_notes.md
