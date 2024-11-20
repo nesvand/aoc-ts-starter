@@ -1,5 +1,4 @@
-import { spawn } from 'node:child_process';
-import { writeFileSync } from 'node:fs';
+import { spawn } from 'bun';
 import { ArrayBenchmarks, BitsBenchmarks, StringViewBenchmarks } from './types';
 
 interface BenchmarkResult {
@@ -11,54 +10,46 @@ interface BenchmarkResult {
 }
 
 async function runBenchmark(category: string, name: string): Promise<BenchmarkResult> {
-    return new Promise((resolve, reject) => {
-        const process = spawn('bun', ['run', `lib/bench/${category}.ts`, name, '-w 100', '-r 1000']);
-        let output = '';
+    const process = spawn(['bun', 'run', `lib/bench/${category}.ts`, name, '-w 100', '-r 1000']);
+    const decoder = new TextDecoder();
 
-        process.stdout.on('data', (data) => {
-            output += data.toString();
-
-            if (output.includes('Range:')) {
-                const meanMatch = output.match(/Mean:\s+(\d+\.\d+)(µs|ms|ns|s)\s+±(\d+\.\d+)(µs|ms|ns|s)/);
+    try {
+        for await (const rawLine of process.stdout) {
+            const line = decoder.decode(rawLine);
+            if (line.includes('Mean:')) {
+                const meanMatch = line.match(/Mean:\s+(\d+\.\d+)(µs|ms|ns|s)\s+±(\d+\.\d+)(µs|ms|ns|s)/);
                 if (!meanMatch) {
-                    console.log('Failed to parse output:', output);
-                    reject(new Error(`Could not parse mean time from output: ${output}`));
-                    return;
+                    console.log('Failed to parse output:', line);
+                    throw new Error(`Could not parse mean time from output: ${line}`);
                 }
 
                 const [, meanTime, meanUnit, marginTime, marginUnit] = meanMatch;
                 if (!meanTime || !meanUnit || !marginTime || !marginUnit) {
-                    reject(new Error('Missing time or unit in match'));
-                    return;
+                    throw new Error('Missing time or unit in matoh');
                 }
-
-                // console.log('Matched values:', { meanTime, meanUnit, marginTime, marginUnit });
 
                 const meanNanos = convertToNanos(Number(meanTime), meanUnit);
                 const marginNanos = convertToNanos(Number(marginTime), marginUnit);
                 const opsPerSec = 1_000_000_000 / meanNanos;
 
-                resolve({
+                return {
                     name,
                     category,
                     meanNanos,
                     marginNanos,
                     opsPerSec,
-                });
+                };
             }
-        });
+        }
 
-        process.on('close', (code) => {
-            if (code !== 0) {
-                reject(new Error(`Benchmark failed with code ${code}`));
-            }
-        });
-    });
+        throw new Error('No range found in output');
+    } catch (err) {
+        process.kill();
+        throw err;
+    }
 }
 
 function convertToNanos(value: number, unit: string): number {
-    // console.log('Converting time:', { value, unit });
-
     const normalizedUnit = unit === 'µs' || unit === 'us' || unit === '\u00B5s' ? 'µs' : unit;
 
     switch (normalizedUnit) {
@@ -114,7 +105,7 @@ async function runAllBenchmarks(): Promise<void> {
     }
 
     const markdown = generateMarkdownTable(results);
-    writeFileSync('lib/bench/BENCHMARKS.md', markdown);
+    await Bun.write('lib/bench/BENCHMARKS.md', markdown);
     console.log('\nBenchmark results written to lib/bench/BENCHMARKS.md');
 }
 

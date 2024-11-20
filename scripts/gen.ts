@@ -1,9 +1,7 @@
-import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import chalk from 'chalk';
-import dotenv from 'dotenv';
 import * as ejs from 'ejs';
-import fetch from 'node-fetch';
 import z from 'zod';
 import { fromZodError } from 'zod-validation-error';
 
@@ -25,14 +23,11 @@ const pipeAsync =
         funcs.reduce(async (v: unknown, func: CallableFunction) => func(await v), input);
 
 // check it the file exists or not
-const filePathExists = async (file: string): Promise<boolean> =>
-    await access(file)
-        .then(() => true)
-        .catch(() => false);
+const filePathExists = async (file: string): Promise<boolean> => Bun.file(file).exists();
 
 // read the template file
 async function readTemplate(templateFile: string): Promise<string> {
-    return readFile(templateFile, 'utf8');
+    return await Bun.file(templateFile).text();
 }
 
 type TemplateData = {
@@ -64,7 +59,7 @@ function createFile(filename: string) {
             console.log(err);
         }
 
-        await writeFile(filename, content);
+        await Bun.write(filename, content);
         console.log(`${chalk.green('* creating ')}${filename}`);
     };
 }
@@ -106,8 +101,6 @@ const DayArgumentValidator = /(?<=day)\d+(?!\w)/;
 
 // run the main routine
 (async () => {
-    dotenv.config();
-
     const env = envSchema.safeParse(process.env);
     if (!env.success) {
         console.error(fromZodError(env.error));

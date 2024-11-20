@@ -13,7 +13,7 @@ export const asyncTimes = async <T>(n: number, operation: () => Promise<T>, para
     return parallel
         ? Promise.all(Array.from({ length: n }, () => operation()))
         : Array.from({ length: n }).reduce<Promise<T[]>>(
-              async (acc, _, i) => {
+              async (acc, _) => {
                   const results = await acc;
                   results.push(await operation());
                   return results;
