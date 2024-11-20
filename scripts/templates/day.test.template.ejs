@@ -1,17 +1,16 @@
 // Advent of Code - Day <%= data.dayNumber %>
 import { expect, test } from 'bun:test';
-import { readFileSync } from 'node:fs';
 import { part1, part2 } from '../src/<%= data.dayName %>';
 
 let input = '';
 try {
-    input = readFileSync('src/<%= data.dayName %>/resources/input.txt', 'utf8');
+    input = await Bun.file('src/<%= data.dayName %>/resources/input.txt').text();
 } catch (e) {
     // ignore
 }
 
 test('part one test', () => {
-    // biome-ignore lint/style/noUnusedTemplateLiteral: <explanation>
+    // biome-ignore lint/style/noUnusedTemplateLiteral: Empty by design
     expect(part1(``)).toBe(0);
 });
 
@@ -22,7 +21,7 @@ if (input !== '') {
 }
 
 test('part two test', () => {
-    // biome-ignore lint/style/noUnusedTemplateLiteral: <explanation>
+    // biome-ignore lint/style/noUnusedTemplateLiteral: Empty by design
     expect(part2(``)).toBe(0);
 });
 

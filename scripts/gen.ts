@@ -1,9 +1,9 @@
+import { mkdir } from 'node:fs/promises';
+import path from 'node:path';
 import chalk from 'chalk';
 import * as ejs from 'ejs';
 import z from 'zod';
 import { fromZodError } from 'zod-validation-error';
-import path from 'node:path';
-import { mkdir } from 'node:fs/promises';
 
 const templateTargets = (dayName: string) =>
     [

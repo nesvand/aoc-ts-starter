@@ -32,8 +32,7 @@ const HEX_TO_BINARY: Record<string, string> = {
 export const hexToPaddedBinary = (hex: string): string => {
     let result = '';
     for (let i = 0; i < hex.length; i++) {
-        // biome-ignore lint/style/noNonNullAssertion: Our loop guarantees hex[i] exists
-        const binary = HEX_TO_BINARY[hex[i]!];
+        const binary = HEX_TO_BINARY[hex[i]];
         if (!binary) throw new Error(`Invalid hex character: ${hex[i]}`);
         result += binary;
     }
@@ -51,8 +50,7 @@ export const bitStringToNumber = (bitString: string): number => {
 export const bitsToNumber = (bits: Bit[]): number => {
     let result = 0;
     for (let i = 0; i < bits.length; i++) {
-        // biome-ignore lint/style/noNonNullAssertion: Our loop guarantees bits[i] exists
-        result = (result << 1) | bits[i]!;
+        result = (result << 1) | bits[i];
     }
     return result;
 };
