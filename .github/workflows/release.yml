@@ -17,8 +17,6 @@ jobs:
         uses: erlete/version-updater@v2.0
         with:
           target-file: package.json
-          commit-title: "Bump version"
-          commit-description: "Updates package.json version to match {version}"
       
       - name: Generate Release Notes
         id: release_notes
