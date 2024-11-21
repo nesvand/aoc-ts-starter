@@ -4,13 +4,15 @@ on:
   push:
     branches:
       - main
-  pull_request_target:
+  pull_request:
     types: [opened, reopened, synchronize]
 
 permissions:
   contents: write
   pull-requests: write
   issues: read
+  statuses: write
+  checks: write
 
 jobs:
   update_release_draft:
@@ -21,5 +23,6 @@ jobs:
           commitish: main
           publish: false
           prerelease: false
+          config-name: release-drafter.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
