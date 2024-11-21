@@ -33,6 +33,18 @@ The project includes a robust `StringView` class for efficient string manipulati
   - Integer parsing with sign handling
   - Floating-point parsing with proper precision
 
+### Data Structure Examples
+The project includes detailed examples for various data structures that can help in solving puzzles, and just in general!
+
+- [Binary Heap](lib/utils/data/BINARY_HEAP.md) - Priority queues and scheduling
+- [Ring Buffer](lib/utils/data/RING_BUFFER.md) - Circular queues and sliding windows
+- [Segment Tree](lib/utils/data/SEGMENT_TREE.md) - Range queries and updates
+- [Trie](lib/utils/data/TRIE.md) - Prefix-based string operations
+- [Disjoint Set](lib/utils/data/DISJOINT_SET.md) - Connected components and grouping
+- [Combined Examples](lib/utils/data/COMBINED_EXAMPLES.md) - Using multiple data structures together
+
+Each example includes practical use cases and implementation patterns.
+
 ### Benchmarking
 Built-in benchmarking utilities for performance testing:
 ```bash
