@@ -1,6 +1,6 @@
 {
     "name": "advent-of-code-2024-typescript",
-    "version": "0.2.5",
+    "version": "0.2.6",
     "description": "Typescript solutions for Advent of Code 2024",
     "scripts": {
         "test": "scripts/test.sh",
