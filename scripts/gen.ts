@@ -131,8 +131,9 @@ const DayArgumentValidator = /(?<=day)\d+(?!\w)/;
         dayNumber,
     } satisfies TemplateData;
 
-    const { AOC_YEAR: year, AOC_SESSION: session } = env.data;
-    const puzzleInput = await fetchPuzzleInput(year ?? defaultYear(), dayNumber, session);
+    const { AOC_YEAR: _year, AOC_SESSION: session } = env.data;
+    const year = _year ?? defaultYear();
+    const puzzleInput = await fetchPuzzleInput(year, dayNumber, session);
 
     try {
         // create the input file
