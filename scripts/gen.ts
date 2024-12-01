@@ -19,8 +19,8 @@ const inputTargetPath = (dayName: string): string => `src/${dayName}/resources/i
 
 const pipeAsync =
     (...funcs: CallableFunction[]) =>
-    (input: unknown) =>
-        funcs.reduce(async (v: unknown, func: CallableFunction) => func(await v), input);
+        (input: unknown) =>
+            funcs.reduce(async (v: unknown, func: CallableFunction) => func(await v), input);
 
 // check it the file exists or not
 const filePathExists = async (file: string): Promise<boolean> => Bun.file(file).exists();

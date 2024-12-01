@@ -8,7 +8,13 @@
         "start": "scripts/start.sh",
         "coverage": "bun test --coverage"
     },
-    "keywords": ["aoc", "node", "typescript", "advent-of-code", "bun"],
+    "keywords": [
+        "aoc",
+        "node",
+        "typescript",
+        "advent-of-code",
+        "bun"
+    ],
     "author": "Andrew Nesvadba <nesvand@gmail.com>k",
     "license": "MIT",
     "dependencies": {
@@ -29,5 +35,7 @@
         "zod": "3.23.8",
         "zod-validation-error": "3.4.0"
     },
-    "workspaces": ["lib"]
+    "workspaces": [
+        "lib"
+    ]
 }
