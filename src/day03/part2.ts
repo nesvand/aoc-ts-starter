@@ -4,7 +4,6 @@ import { mulResult } from "./part1";
 
 export function part2(input: string): number {
     const program = input.trim();
-    console.dir(program);
     // Split on do() and don't()
     const doBlocks = program.split('do()');
     const validBlocks = doBlocks.map((doBlock) => doBlock.split("don't()")).reduce((validBlocks, dontBlock) => {
