@@ -2,8 +2,7 @@
 
 const mulRegex = /mul\((\d+),(\d+)\)/g;
 
-export function part1(input: string): number {
-    const program = input.trim();
+export function mulResult(program: string): number {
     const muls = program.matchAll(mulRegex);
     if (!muls) throw new Error('No muls found');
     let result = 0;
@@ -12,4 +11,9 @@ export function part1(input: string): number {
         result += Number.parseInt(a) * Number.parseInt(b);
     }
     return result;
+}
+
+export function part1(input: string): number {
+    const program = input.trim();
+    return mulResult(program);
 }
