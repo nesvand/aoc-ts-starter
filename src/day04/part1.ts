@@ -1,12 +1,25 @@
 // Advent of Code - Day 4 - Part One
 
-import { } from '@lib/general'
+export const outOfBounds = () => true;
 
-const dx = [-1, 0, 1, 0, -1, 1, -1, 1];
-const dy = [0, 1, 0, -1, 1, -1, -1, 1];
+const directions = [
+    [0, 1],
+    [0, -1],
+    [1, 0],
+    [-1, 0],
+    [1, 1],
+    [-1, 1],
+    [1, -1],
+    [-1, -1],
+];
+const rest = ['M', 'A', 'S'];
 
-export function outOfBounds(x: number, y: number, grid: string[][]): boolean {
-    return x < 0 || x >= grid[0].length || y < 0 || y >= grid.length;
+function* gridIterator<T>(grid: T[][]) {
+    for (let y = 0; y < grid.length; y++) {
+        for (let x = 0; x < grid[y].length; x++) {
+            yield [x, y, grid[y][x]] as const;
+        }
+    }
 }
 
 export function part1(input: string): number {
@@ -16,28 +29,21 @@ export function part1(input: string): number {
         .map((line) => line.split(''));
 
     let count = 0;
-    for (let x = 0; x < grid[0].length; x++) {
-        for (let y = 0; y < grid.length; y++) {
-            if (grid[y][x] !== 'X') continue;
-            for (let offsetIdx = 0; offsetIdx < 8; offsetIdx++) {
-                const cdx = dx[offsetIdx];
-                const cdy = dy[offsetIdx];
+    for (const [x, y, cell] of gridIterator(grid)) {
+        if (cell !== 'X') continue;
+        for (const dir of directions) {
+            try {
+                const [cdx, cdy] = dir;
                 let neighbourX = x + cdx;
                 let neighbourY = y + cdy;
-                if (outOfBounds(neighbourX, neighbourY, grid)) continue;
-                if (grid[neighbourY][neighbourX] === 'M') {
+                for (const next of rest) {
+                    if (grid[neighbourY][neighbourX] !== next) throw new Error('invalid path');
                     neighbourX += cdx;
                     neighbourY += cdy;
-                    if (outOfBounds(neighbourX, neighbourY, grid)) continue;
-                    if (grid[neighbourY][neighbourX] === 'A') {
-                        neighbourX += cdx;
-                        neighbourY += cdy;
-                        if (outOfBounds(neighbourX, neighbourY, grid)) continue;
-                        if (grid[neighbourY][neighbourX] === 'S') {
-                            count++;
-                        }
-                    }
                 }
+                count++;
+            } catch (_) {
+                // don't care - catches out of bounds and invalid paths
             }
         }
     }
