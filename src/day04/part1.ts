@@ -1,7 +1,5 @@
 // Advent of Code - Day 4 - Part One
 
-export const outOfBounds = () => true;
-
 const directions = [
     [0, 1],
     [0, -1],
